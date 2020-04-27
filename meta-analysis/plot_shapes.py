@@ -30,6 +30,14 @@ if __name__ == "__main__":
     plt.xlabel('Megapixels')
     plt.savefig(args.output + '/hist_megapixels.png', bbox_inches='tight')
     plt.close()
+    
+    plt.figure(figsize=(8,6))
+    plt.scatter(df['width'], df['height'], color='white', edgecolor='k')
+    plt.grid(alpha=0.2)
+    plt.xlabel('Width')
+    plt.xlabel('Height')
+    plt.savefig(args.output + '/scatter_shape.png', bbox_inches='tight')
+    plt.close()
 
     plt.figure(figsize=(8,6))
     plt.hist(df['megapixels'], bins=40, edgecolor='k')

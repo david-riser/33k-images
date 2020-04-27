@@ -35,7 +35,7 @@ if __name__ == "__main__":
     plt.scatter(df['width'], df['height'], color='white', edgecolor='k')
     plt.grid(alpha=0.2)
     plt.xlabel('Width')
-    plt.xlabel('Height')
+    plt.ylabel('Height')
     plt.savefig(args.output + '/scatter_shape.png', bbox_inches='tight')
     plt.close()
 

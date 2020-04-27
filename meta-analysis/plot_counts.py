@@ -35,8 +35,9 @@ if __name__ == "__main__":
     plt.savefig(args.output + '/hist_nimages.png', bbox_inches='tight')
     plt.close()
 
+    index = np.argsort(df['nimages'])[::-1]
     plt.figure(figsize=(8,24))
-    plt.barh(df['label'], df['nimages'], edgecolor='k')
+    plt.barh(df['label'].iloc[index][:40], df['nimages'].iloc[index][:40], edgecolor='k')
     plt.ylabel('Class')
     plt.xlabel('Number of Images')
     plt.savefig(args.output + '/barh_nimages.png', bbox_inches='tight')

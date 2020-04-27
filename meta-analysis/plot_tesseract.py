@@ -53,12 +53,14 @@ if __name__ == "__main__":
     plt.figure(figsize=(8,6))
     plt.hist(data['n_words'], bins=np.linspace(0,30,31), edgecolor='k')
     plt.grid(alpha=0.2)
+    plt.xlabel('Number of Words')
     plt.savefig(args.output + '/hist_nwords_zoom.png', bbox_inches='tight')
     plt.close()
 
     plt.figure(figsize=(8,6))
     plt.hist(data['n_words'], bins=np.linspace(0,200,20), edgecolor='k')
     plt.grid(alpha=0.2)
+    plt.xlabel('Number of Words')
     plt.savefig(args.output + '/hist_nwords.png', bbox_inches='tight')
     plt.close()
 

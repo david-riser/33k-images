@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 import pandas as pd
 import os
 
@@ -47,7 +48,13 @@ if __name__ == "__main__":
 
     data = pd.DataFrame({'label':labels, 'file':files})
     data.to_csv(args.output, index=False)
+
+    # Write out a file that just contains larger classes
+    aggregate_counts = data.groupby('label').aggregate({'file':len}).reset_index()
+    large_classes = aggregate_counts['label'][np.where(aggregate_counts['file'] > 100)[0]].values
+
+    data['is_large'] = data['label'].apply(lambda x: x in large_classes)
+    data_sub = data[data['is_large'] == True] 
+    data_sub.to_csv(args.output.split('.csv')[0] + "_100.csv", index=False)
     
-
-
     

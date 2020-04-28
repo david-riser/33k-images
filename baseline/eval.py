@@ -16,7 +16,7 @@ print(assignments)
 agg = data.groupby(['label_code']).agg({'cluster':lambda x: np.unique(x, return_counts=True)}).reset_index()
 print(agg)
 
-plt.figure(figsize=(8,6))
+plt.figure(figsize=(32,32))
 sns.heatmap(conf_mat, annot=True)
 plt.savefig('figures/confusion.png', bbox_inches='tight')
 plt.close()

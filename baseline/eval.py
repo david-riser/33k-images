@@ -14,7 +14,17 @@ assignments = np.argmax(conf_mat, axis=0)
 print(assignments)
 
 
-plt.figure(figsize=(32,32))
+plt.figure(figsize=(12,12))
 sns.heatmap(conf_mat, annot=True)
 plt.savefig('figures/confusion.png', bbox_inches='tight', dpi=200)
+plt.close()
+
+plt.figure(figsize=(12,12))
+sns.heatmap(np.divide(conf_mat, conf_mat.sum(axis=0)), annot=True)
+plt.savefig('figures/conflusion_normed_by_truth.png', bbox_inches='tight', dpi=200)
+plt.close()
+
+plt.figure(figsize=(12,12))
+sns.heatmap(np.divide(conf_mat, conf_mat.sum(axis=1)), annot=True)
+plt.savefig('figures/conflusion_normed_by_cluster_size.png', bbox_inches='tight', dpi=200)
 plt.close()

@@ -15,16 +15,16 @@ print(assignments)
 
 
 plt.figure(figsize=(12,12))
-sns.heatmap(conf_mat, annot=True)
+sns.heatmap(conf_mat, annot=True, fmt='d')
 plt.savefig('figures/confusion.png', bbox_inches='tight', dpi=200)
 plt.close()
 
 plt.figure(figsize=(12,12))
-sns.heatmap(np.divide(conf_mat, conf_mat.sum(axis=0)), annot=True)
+sns.heatmap(np.divide(conf_mat, conf_mat.sum(axis=0)), annot=True, fmt='.2f')
 plt.savefig('figures/conflusion_normed_by_truth.png', bbox_inches='tight', dpi=200)
 plt.close()
 
 plt.figure(figsize=(12,12))
-sns.heatmap(np.divide(conf_mat, conf_mat.sum(axis=1)), annot=True)
+sns.heatmap(np.divide(conf_mat, conf_mat.sum(axis=1)), annot=True, fmt='.2f')
 plt.savefig('figures/conflusion_normed_by_cluster_size.png', bbox_inches='tight', dpi=200)
 plt.close()

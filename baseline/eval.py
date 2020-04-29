@@ -46,13 +46,15 @@ for row in range(side_len):
             not_ideal_figure[row, col] = pred_label_sorted_data['label_code'].values[index]
 
 # Create the map from ideal points
-plt.figure(figsize=(16,6), dpi=100)
-plt.subplot(1, 2, 1)
-plt.imshow(ideal_figure, cmap=plt.cm.get_cmap('rainbow', n_classes))
-plt.title('True Label Assignment')
-plt.subplot(1, 2, 2)
-plt.imshow(not_ideal_figure, cmap=plt.cm.get_cmap('rainbow', n_classes))
-plt.title('Cluster Assignment')
-plt.savefig('figures/cluster_colormap.png', bbox_inches='tight')
-plt.close()
+for cmap in ['rainbow', 'plasma', 'viridis', 'Reds', 'Blues']:
+    plt.figure(figsize=(16,6), dpi=100)
+    plt.subplot(1, 2, 1)
+    plt.imshow(ideal_figure, cmap=plt.cm.get_cmap(cmap, n_classes))
+    plt.title('True Label Assignment')
+    plt.subplot(1, 2, 2)
+    plt.imshow(not_ideal_figure, cmap=plt.cm.get_cmap(cmap, n_classes))
+    plt.title('Cluster Assignment')
+    plt.savefig('figures/cluster_colormap_{}.png'.format(cmap.lower()),
+                bbox_inches='tight')
+    plt.close()
 

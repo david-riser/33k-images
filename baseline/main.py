@@ -5,6 +5,7 @@ import pandas as pd
 import tqdm
 import pickle
 
+from functools import partial
 from keras.applications import resnet50, inception_v3, nasnet, xception
 from keras.preprocessing import image
 from multiprocessing import Pool
@@ -18,6 +19,7 @@ def get_args():
     ap.add_argument('--pooling', required=True, type=str)
     ap.add_argument('--output_dir', required=True, type=str)
     ap.add_argument('--cores', required=True, type=int)
+    ap.add_argument('--save_features', action='store_true')
     return ap.parse_args()
 
 def model_factory(model_name, pooling=None):
@@ -58,9 +60,9 @@ def predict_image(model, image_path, preprocess_input):
     x = load_image(image_path)
     return model.predict(x)
 
-def predict_images(model, image_paths, preprocess_input, cores=1, target_size=(224,224)):
+def predict_images(model, image_paths, preprocess_input, cores, image_loader):
     pool = Pool(cores)
-    x = np.array(pool.map(lambda f: load_image(f,target_size), image_paths))
+    x = np.array(pool.map(image_loader, image_paths))
     pool.close()
     pool.join()    
     x = x.reshape(x.shape[0], x.shape[2], x.shape[3], x.shape[4])
@@ -84,14 +86,17 @@ if __name__ == "__main__":
         target_size = (331,331)
     else:
         target_size = (224,224)
-    
+
+    image_loader = partial(load_image, target_size=target_size)
     #for i in tqdm.tqdm(range(len(image_df))):
 
     batch_size = 1024
     batches = int(np.ceil(len(image_df) / batch_size))
-    for i in tqdm.tqdm(range(1)):
+    for i in tqdm.tqdm(range(batches)):
         test_images = [args.data_dir + '/' + img for img in image_df['file'].values[i*batch_size : (i+1)*batch_size]]
-        features[i*batch_size : (i+1)*batch_size,:] = predict_images(model, test_images, preprocess_input, args.cores, target_size)
+        features[i*batch_size : (i+1)*batch_size,:] = predict_images(
+            model, test_images, preprocess_input, args.cores, image_loader
+        )
     
     kmeans = KMeans(n_clusters=n_classes)
     clusters = kmeans.fit_predict(features)
@@ -102,3 +107,7 @@ if __name__ == "__main__":
 
     with open(args.output_dir + '/{}_{}_centroids.pkl'.format(args.backbone, args.pooling), 'wb') as out:
         pickle.dump({'centroids':kmeans.cluster_centers_, 'labels':kmeans.labels_, 'inertia':kmeans.inertia_}, out)
+
+    if args.save_features:
+        with open(args.output_dir + '/{}_{}_features.pkl'.format(args.backbone, args.pooling), 'wb') as out:
+            pickle.dump({'features':features}, out)

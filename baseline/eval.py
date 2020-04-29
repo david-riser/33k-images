@@ -48,10 +48,10 @@ for row in range(side_len):
 # Create the map from ideal points
 plt.figure(figsize=(16,6), dpi=100)
 plt.subplot(1, 2, 1)
-plt.imshow(ideal_figure, cmap='rainbow', vmin=0, vmax=n_classes)
+plt.imshow(ideal_figure, cmap=plt.cm.get_cmap('rainbow', n_classes))
 plt.title('True Label Assignment')
 plt.subplot(1, 2, 2)
-plt.imshow(not_ideal_figure, cmap='rainbow', vmin=0, vmax=n_classes)
+plt.imshow(not_ideal_figure, cmap=plt.cm.get_cmap('rainbow', n_classes))
 plt.title('Cluster Assignment')
 plt.savefig('figures/cluster_colormap.png', bbox_inches='tight')
 plt.close()

@@ -34,27 +34,29 @@ print(colors)
 
 ideal_figure = np.zeros((side_len, side_len))
 
-for row in range(n_classes):
-    for col in range(n_classes):
+for row in range(side_len):
+    for col in range(side_len):
         index = col + row * side_len
-        ideal_figure[row, col] = data['label_code'].values[index]
+        if index < len(data):
+            ideal_figure[row, col] = data['label_code'].values[index]
 
 # Create the map from ideal points
 plt.figure(figsize=(8,6), dpi=100)
-plt.imshow(ideal_figure)
+plt.imshow(ideal_figure, cmap=cm.rainbow)
 plt.savefig('figures/ideal_colormap.png', bbox_inches='tight')
 plt.close()
 
 not_ideal_figure = np.zeros((side_len, side_len))
 
-for row in range(n_classes):
-    for col in range(n_classes):
+for row in range(side_len):
+    for col in range(side_len):
         index = col + row * side_len
-        not_ideal_figure[row, col] = data['cluster'].values[index]
+        if index < len(data):
+            not_ideal_figure[row, col] = data['cluster'].values[index]
 
 # Create the map from ideal points
 plt.figure(figsize=(8,6), dpi=100)
-plt.imshow(ideal_figure)
+plt.imshow(not_ideal_figure, cmap=cm.rainbow)
 plt.savefig('figures/not_ideal_colormap.png', bbox_inches='tight')
 plt.close()
 

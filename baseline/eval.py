@@ -42,7 +42,7 @@ for row in range(side_len):
 
 # Create the map from ideal points
 plt.figure(figsize=(8,6), dpi=100)
-plt.imshow(ideal_figure, cmap=cm.rainbow)
+plt.imshow(ideal_figure, cmap='rainbow')
 plt.savefig('figures/ideal_colormap.png', bbox_inches='tight')
 plt.close()
 
@@ -56,7 +56,7 @@ for row in range(side_len):
 
 # Create the map from ideal points
 plt.figure(figsize=(8,6), dpi=100)
-plt.imshow(not_ideal_figure, cmap=cm.rainbow)
+plt.imshow(not_ideal_figure, cmap='rainbow')
 plt.savefig('figures/not_ideal_colormap.png', bbox_inches='tight')
 plt.close()
 

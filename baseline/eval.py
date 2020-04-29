@@ -32,31 +32,27 @@ print(f"Creating {side_len} side length figure for {n_classes} classes.")
 colors = cm.rainbow(0, 1, n_classes)
 print(colors)
 
+# For figure
+true_label_sorted_data = data.sort_values('label_code')
+pred_label_sorted_data = data.sort_values('cluster')
+
 ideal_figure = np.zeros((side_len, side_len))
-
-for row in range(side_len):
-    for col in range(side_len):
-        index = col + row * side_len
-        if index < len(data):
-            ideal_figure[row, col] = data['label_code'].values[index]
-
-# Create the map from ideal points
-plt.figure(figsize=(8,6), dpi=100)
-plt.imshow(ideal_figure, cmap='rainbow')
-plt.savefig('figures/ideal_colormap.png', bbox_inches='tight')
-plt.close()
-
 not_ideal_figure = np.zeros((side_len, side_len))
-
 for row in range(side_len):
     for col in range(side_len):
         index = col + row * side_len
         if index < len(data):
-            not_ideal_figure[row, col] = data['cluster'].values[index]
+            ideal_figure[row, col] = true_label_sorted_data['label_code'].values[index]
+            not_ideal_figure[row, col] = pred_label_sorted_data['label_code'].values[index]
 
 # Create the map from ideal points
-plt.figure(figsize=(8,6), dpi=100)
-plt.imshow(not_ideal_figure, cmap='rainbow')
-plt.savefig('figures/not_ideal_colormap.png', bbox_inches='tight')
+plt.figure(figsize=(16,6), dpi=100)
+plt.subplot(1, 2, 1)
+plt.imshow(ideal_figure, cmap='rainbow', vmin=0, vmax=n_classes)
+plt.title('True Label Assignment')
+plt.subplot(1, 2, 2)
+plt.imshow(not_ideal_figure, cmap='rainbow', vmin=0, vmax=n_classes)
+plt.title('Cluster Assignment')
+plt.savefig('figures/cluster_colormap.png', bbox_inches='tight')
 plt.close()
 

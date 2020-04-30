@@ -28,7 +28,7 @@ def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
     for row in range(side_len):
         for col in range(side_len):
             index = col + row * side_len
-            if index < len(data):
+            if index < len(true_label_sorted_data):
                 ideal_figure[row, col] = true_label_sorted_data['label_code'].values[index]
                 not_ideal_figure[row, col] = pred_label_sorted_data['label_code'].values[index]
 

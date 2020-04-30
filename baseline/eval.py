@@ -63,7 +63,7 @@ if __name__ == "__main__":
         assignment = hungarian_method(data[csvfile]['label_code'], data[csvfile]['cluster'])
 
         for pair in assignment:
-            data[csvfile]['cluster'].replace(pair[1], pair[0], inplace=True)
+            data[csvfile]['cluster'].replace(pair[0], pair[1], inplace=True)
         
         rand_index[csvfile] = adjusted_rand_score(
             data[csvfile]['label_code'].values, data[csvfile]['cluster'].values)

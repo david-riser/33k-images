@@ -18,8 +18,8 @@ def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
 
     side_len = int(np.ceil(np.sqrt(len(true_label_sorted_data))))
     n_classes = true_label_sorted_data['label_code'].nunique()
-    print('Creating visual for {}:{} size: {}x{}'.format(
-        backbone, pooling, side_len, side_len
+    print('Creating visual for {}:{} size: {}x{} with {} classes'.format(
+        backbone, pooling, side_len, side_len, n_classes
     ))
 
     # Create images
@@ -50,11 +50,13 @@ if __name__ == "__main__":
     input_folder = './artifacts'
     data = {}
     rand_index = {}
+    name_lut = {}
     for csvfile in glob.glob(input_folder + '/*'):
 
         backbone = csvfile.split('/')[-1].split('_')[0]
         pooling = csvfile.split('/')[-1].split('_')[1]
-
+        name_lut[csvfile] = ':'.join([backbone, pooling])
+        
         data[csvfile] = pd.read_csv(csvfile)
         encoder = LabelEncoder()
         data[csvfile]['label_code'] = encoder.fit_transform(data[csvfile]['label'].values)
@@ -66,3 +68,16 @@ if __name__ == "__main__":
         pred_label_sorted_data = data[csvfile].sort_values('cluster')
         plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data, backbone, pooling)
 
+    # Create a bar chart with ARS
+    plt.figure(figsize=(12,12))
+    plt.barh(
+        list(name_lut.values()),
+        list(rand_index.values()),
+        edgecolor='k'
+    )
+    plt.grid(alpha=0.2)
+    plt.title('Image Clusters w/ Transfer Learning (untuned)')
+    plt.xlabel('Adjusted Rand Index')
+    plt.xlim([0.0, 0.4])
+    plt.savefig('figures/rand_barh.png', bbox_inches='tight', dpi=100)
+    plt.close()

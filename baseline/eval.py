@@ -8,7 +8,7 @@ import pandas as pd
 # Some clustering utilities 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import adjusted_rand_score, confusion_matrix
-
+from metrics import hungarian_method, hungarian_method2
 
 def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
                      backbone, pooling):
@@ -60,6 +60,11 @@ if __name__ == "__main__":
         data[csvfile] = pd.read_csv(csvfile)
         encoder = LabelEncoder()
         data[csvfile]['label_code'] = encoder.fit_transform(data[csvfile]['label'].values)
+        assignment = hungarian_method(data[csvfile]['label_code'], data[csvfile]['cluster'])
+
+        for pair in assignment:
+            data[csvfile]['cluster'].replace(pair[0], pair[1])
+        
         rand_index[csvfile] = adjusted_rand_score(
             data[csvfile]['label_code'].values, data[csvfile]['cluster'].values)
         print("Adjusted Rand Score ({0}): {1:8.6f}".format(csvfile, rand_index[csvfile]))

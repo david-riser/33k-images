@@ -33,7 +33,7 @@ def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
                 not_ideal_figure[row, col] = pred_label_sorted_data['label_code'].values[index]
 
     # Create the map from ideal points
-    for cmap in ['rainbow', 'Blues']:
+    for cmap in ['rainbow', 'Blues', 'Spectral', 'binary', 'jet']:
         plt.figure(figsize=(16,6), dpi=100)
         plt.subplot(1, 2, 1)
         plt.imshow(ideal_figure, cmap=plt.cm.get_cmap(cmap, n_classes))
@@ -79,5 +79,5 @@ if __name__ == "__main__":
     plt.title('Image Clusters w/ Transfer Learning (untuned)')
     plt.xlabel('Adjusted Rand Index')
     plt.xlim([0.0, 0.4])
-    plt.savefig('figures/rand_barh.png', bbox_inches='tight', dpi=100)
+    plt.savefig('figures/rand_barh.png', bbox_inches='tight', dpi=50)
     plt.close()

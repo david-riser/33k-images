@@ -77,6 +77,10 @@ if __name__ == "__main__":
         plot_confusion(data[csvfile]['label_code'], data[csvfile]['cluster'],
                        backbone, pooling, 'before_mapping')
         
+        rand_index[csvfile] = adjusted_rand_score(
+            data[csvfile]['label_code'].values, data[csvfile]['cluster'].values)
+        print("Adjusted Rand Score ({0}): {1:8.6f}".format(csvfile, rand_index[csvfile]))
+
         for pair in assignment:
             data[csvfile]['cluster'].replace(pair[0], pair[1], inplace=True)
 
@@ -85,9 +89,6 @@ if __name__ == "__main__":
 
         weight_acc = balanced_accuracy_score(data[csvfile]['label_code'], data[csvfile]['cluster'])
         print("Balanced Accuracy Score: {0:8.6f}".format(weight_acc))
-        rand_index[csvfile] = adjusted_rand_score(
-            data[csvfile]['label_code'].values, data[csvfile]['cluster'].values)
-        print("Adjusted Rand Score ({0}): {1:8.6f}".format(csvfile, rand_index[csvfile]))
         
         true_label_sorted_data = data[csvfile].sort_values('label_code')
         pred_label_sorted_data = data[csvfile].sort_values('cluster')

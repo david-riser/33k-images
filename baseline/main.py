@@ -101,7 +101,7 @@ if __name__ == "__main__":
     kmeans = KMeans(n_clusters=n_classes)
     clusters = kmeans.fit_predict(features)
     pd.DataFrame(
-        {'label':image_df['label'], 'cluster':clusters}
+        {'label':image_df['label'], 'cluster':clusters, 'file':image_df['file']}
     ).to_csv(args.output_dir + '/{}_{}_clusters.csv'.format(
         args.backbone, args.pooling), index=False)
 

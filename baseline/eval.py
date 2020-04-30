@@ -33,7 +33,7 @@ def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
                 not_ideal_figure[row, col] = pred_label_sorted_data['label_code'].values[index]
 
     # Create the map from ideal points
-    for cmap in ['rainbow']:
+    for cmap in ['rainbow', 'Blues']:
         plt.figure(figsize=(16,6), dpi=100)
         plt.subplot(1, 2, 1)
         plt.imshow(ideal_figure, cmap=plt.cm.get_cmap(cmap, n_classes))

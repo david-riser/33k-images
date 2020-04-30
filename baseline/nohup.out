@@ -1,400 +1,0 @@
-Using TensorFlow backend.
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/tensorflow_core/__init__.py:1473: The name tf.estimator.inputs is deprecated. Please use tf.compat.v1.estimator.inputs instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:74: The name tf.get_default_graph is deprecated. Please use tf.compat.v1.get_default_graph instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:517: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4185: The name tf.truncated_normal is deprecated. Please use tf.random.truncated_normal instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:174: The name tf.get_default_session is deprecated. Please use tf.compat.v1.get_default_session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:181: The name tf.ConfigProto is deprecated. Please use tf.compat.v1.ConfigProto instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:186: The name tf.Session is deprecated. Please use tf.compat.v1.Session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:190: The name tf.global_variables is deprecated. Please use tf.compat.v1.global_variables instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:199: The name tf.is_variable_initialized is deprecated. Please use tf.compat.v1.is_variable_initialized instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:206: The name tf.variables_initializer is deprecated. Please use tf.compat.v1.variables_initializer instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:1834: The name tf.nn.fused_batch_norm is deprecated. Please use tf.compat.v1.nn.fused_batch_norm instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:133: The name tf.placeholder_with_default is deprecated. Please use tf.compat.v1.placeholder_with_default instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3976: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
-
-We have 15 classes.
-Instantiating a ResNet50
-Downloading data from https://github.com/fchollet/deep-learning-models/releases/download/v0.2/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5
-
-    8192/94653016 [..............................] - ETA: 18s
- 2949120/94653016 [..............................] - ETA: 1s 
- 9977856/94653016 [==>...........................] - ETA: 0s
-16162816/94653016 [====>.........................] - ETA: 0s
-20946944/94653016 [=====>........................] - ETA: 0s
-26189824/94653016 [=======>......................] - ETA: 0s
-31145984/94653016 [========>.....................] - ETA: 0s
-35766272/94653016 [==========>...................] - ETA: 0s
-41205760/94653016 [============>.................] - ETA: 0s
-46227456/94653016 [=============>................] - ETA: 0s
-51118080/94653016 [===============>..............] - ETA: 0s
-56197120/94653016 [================>.............] - ETA: 0s
-61235200/94653016 [==================>...........] - ETA: 0s
-66256896/94653016 [===================>..........] - ETA: 0s
-71229440/94653016 [=====================>........] - ETA: 0s
-76267520/94653016 [=======================>......] - ETA: 0s
-81256448/94653016 [========================>.....] - ETA: 0s
-86278144/94653016 [==========================>...] - ETA: 0s
-91217920/94653016 [===========================>..] - ETA: 0s
-94658560/94653016 [==============================] - 1s 0us/step
-  0%|          | 0/17 [00:00<?, ?it/s]  6%|▌         | 1/17 [00:24<06:39, 24.95s/it] 12%|█▏        | 2/17 [00:35<05:08, 20.55s/it] 18%|█▊        | 3/17 [00:45<04:04, 17.47s/it] 24%|██▎       | 4/17 [00:55<03:19, 15.37s/it] 29%|██▉       | 5/17 [01:06<02:46, 13.86s/it] 35%|███▌      | 6/17 [01:17<02:22, 12.97s/it] 41%|████      | 7/17 [01:28<02:06, 12.60s/it] 47%|████▋     | 8/17 [01:40<01:49, 12.20s/it] 53%|█████▎    | 9/17 [01:49<01:30, 11.30s/it] 59%|█████▉    | 10/17 [01:58<01:15, 10.75s/it] 65%|██████▍   | 11/17 [02:08<01:02, 10.38s/it] 71%|███████   | 12/17 [02:17<00:50, 10.13s/it] 76%|███████▋  | 13/17 [02:27<00:39,  9.88s/it] 82%|████████▏ | 14/17 [02:36<00:29,  9.71s/it] 88%|████████▊ | 15/17 [02:45<00:19,  9.60s/it] 94%|█████████▍| 16/17 [02:55<00:09,  9.56s/it]100%|██████████| 17/17 [03:00<00:00,  8.23s/it]100%|██████████| 17/17 [03:00<00:00, 10.62s/it]
-Using TensorFlow backend.
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/tensorflow_core/__init__.py:1473: The name tf.estimator.inputs is deprecated. Please use tf.compat.v1.estimator.inputs instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:74: The name tf.get_default_graph is deprecated. Please use tf.compat.v1.get_default_graph instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:517: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4185: The name tf.truncated_normal is deprecated. Please use tf.random.truncated_normal instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:174: The name tf.get_default_session is deprecated. Please use tf.compat.v1.get_default_session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:181: The name tf.ConfigProto is deprecated. Please use tf.compat.v1.ConfigProto instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:186: The name tf.Session is deprecated. Please use tf.compat.v1.Session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:190: The name tf.global_variables is deprecated. Please use tf.compat.v1.global_variables instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:199: The name tf.is_variable_initialized is deprecated. Please use tf.compat.v1.is_variable_initialized instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:206: The name tf.variables_initializer is deprecated. Please use tf.compat.v1.variables_initializer instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:1834: The name tf.nn.fused_batch_norm is deprecated. Please use tf.compat.v1.nn.fused_batch_norm instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:133: The name tf.placeholder_with_default is deprecated. Please use tf.compat.v1.placeholder_with_default instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3976: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
-
-  0%|          | 0/17 [00:00<?, ?it/s]We have 15 classes.
-Instantiating a ResNet50
-  6%|▌         | 1/17 [00:12<03:12, 12.06s/it] 12%|█▏        | 2/17 [00:22<02:52, 11.49s/it] 18%|█▊        | 3/17 [00:32<02:35, 11.14s/it] 24%|██▎       | 4/17 [00:43<02:22, 10.98s/it] 29%|██▉       | 5/17 [00:53<02:10, 10.89s/it] 35%|███▌      | 6/17 [01:04<02:00, 10.91s/it] 41%|████      | 7/17 [01:16<01:51, 11.18s/it] 47%|████▋     | 8/17 [01:27<01:40, 11.21s/it] 53%|█████▎    | 9/17 [01:37<01:24, 10.62s/it] 59%|█████▉    | 10/17 [01:46<01:12, 10.33s/it] 65%|██████▍   | 11/17 [01:56<01:00, 10.13s/it] 71%|███████   | 12/17 [02:05<00:49,  9.95s/it] 76%|███████▋  | 13/17 [02:15<00:39,  9.76s/it] 82%|████████▏ | 14/17 [02:24<00:29,  9.70s/it] 88%|████████▊ | 15/17 [02:34<00:19,  9.69s/it] 94%|█████████▍| 16/17 [02:44<00:09,  9.65s/it]100%|██████████| 17/17 [02:49<00:00,  8.29s/it]100%|██████████| 17/17 [02:49<00:00,  9.95s/it]
-Using TensorFlow backend.
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/tensorflow_core/__init__.py:1473: The name tf.estimator.inputs is deprecated. Please use tf.compat.v1.estimator.inputs instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:74: The name tf.get_default_graph is deprecated. Please use tf.compat.v1.get_default_graph instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:517: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4138: The name tf.random_uniform is deprecated. Please use tf.random.uniform instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:174: The name tf.get_default_session is deprecated. Please use tf.compat.v1.get_default_session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:181: The name tf.ConfigProto is deprecated. Please use tf.compat.v1.ConfigProto instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:186: The name tf.Session is deprecated. Please use tf.compat.v1.Session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:190: The name tf.global_variables is deprecated. Please use tf.compat.v1.global_variables instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:199: The name tf.is_variable_initialized is deprecated. Please use tf.compat.v1.is_variable_initialized instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:206: The name tf.variables_initializer is deprecated. Please use tf.compat.v1.variables_initializer instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:1834: The name tf.nn.fused_batch_norm is deprecated. Please use tf.compat.v1.nn.fused_batch_norm instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:133: The name tf.placeholder_with_default is deprecated. Please use tf.compat.v1.placeholder_with_default instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3976: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3980: The name tf.nn.avg_pool is deprecated. Please use tf.nn.avg_pool2d instead.
-
-We have 15 classes.
-Instantiating a InceptionV3
-Downloading data from https://github.com/fchollet/deep-learning-models/releases/download/v0.5/inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5
-
-    8192/87910968 [..............................] - ETA: 0s
- 3170304/87910968 [>.............................] - ETA: 1s
-10436608/87910968 [==>...........................] - ETA: 0s
-17743872/87910968 [=====>........................] - ETA: 0s
-22888448/87910968 [======>.......................] - ETA: 0s
-27820032/87910968 [========>.....................] - ETA: 0s
-32915456/87910968 [==========>...................] - ETA: 0s
-37912576/87910968 [===========>..................] - ETA: 0s
-42909696/87910968 [=============>................] - ETA: 0s
-47865856/87910968 [===============>..............] - ETA: 0s
-52895744/87910968 [=================>............] - ETA: 0s
-57827328/87910968 [==================>...........] - ETA: 0s
-62939136/87910968 [====================>.........] - ETA: 0s
-67944448/87910968 [======================>.......] - ETA: 0s
-72769536/87910968 [=======================>......] - ETA: 0s
-77537280/87910968 [=========================>....] - ETA: 0s
-83107840/87910968 [===========================>..] - ETA: 0s
-87916544/87910968 [==============================] - 1s 0us/step
-  0%|          | 0/17 [00:00<?, ?it/s]  6%|▌         | 1/17 [00:10<02:42, 10.16s/it] 12%|█▏        | 2/17 [00:17<02:19,  9.29s/it] 18%|█▊        | 3/17 [00:24<02:02,  8.71s/it] 24%|██▎       | 4/17 [00:32<01:48,  8.31s/it] 29%|██▉       | 5/17 [00:39<01:36,  8.05s/it] 35%|███▌      | 6/17 [00:47<01:28,  8.02s/it] 41%|████      | 7/17 [00:56<01:22,  8.23s/it] 47%|████▋     | 8/17 [01:04<01:13,  8.21s/it] 53%|█████▎    | 9/17 [01:10<01:01,  7.67s/it] 59%|█████▉    | 10/17 [01:17<00:51,  7.34s/it] 65%|██████▍   | 11/17 [01:23<00:42,  7.10s/it] 71%|███████   | 12/17 [01:30<00:34,  6.91s/it] 76%|███████▋  | 13/17 [01:36<00:27,  6.81s/it] 82%|████████▏ | 14/17 [01:43<00:20,  6.67s/it] 88%|████████▊ | 15/17 [01:49<00:13,  6.57s/it] 94%|█████████▍| 16/17 [01:56<00:06,  6.67s/it]100%|██████████| 17/17 [02:00<00:00,  5.89s/it]100%|██████████| 17/17 [02:00<00:00,  7.10s/it]
-Using TensorFlow backend.
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/tensorflow_core/__init__.py:1473: The name tf.estimator.inputs is deprecated. Please use tf.compat.v1.estimator.inputs instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:74: The name tf.get_default_graph is deprecated. Please use tf.compat.v1.get_default_graph instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:517: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4138: The name tf.random_uniform is deprecated. Please use tf.random.uniform instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:174: The name tf.get_default_session is deprecated. Please use tf.compat.v1.get_default_session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:181: The name tf.ConfigProto is deprecated. Please use tf.compat.v1.ConfigProto instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:186: The name tf.Session is deprecated. Please use tf.compat.v1.Session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:190: The name tf.global_variables is deprecated. Please use tf.compat.v1.global_variables instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:199: The name tf.is_variable_initialized is deprecated. Please use tf.compat.v1.is_variable_initialized instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:206: The name tf.variables_initializer is deprecated. Please use tf.compat.v1.variables_initializer instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:1834: The name tf.nn.fused_batch_norm is deprecated. Please use tf.compat.v1.nn.fused_batch_norm instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:133: The name tf.placeholder_with_default is deprecated. Please use tf.compat.v1.placeholder_with_default instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3976: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3980: The name tf.nn.avg_pool is deprecated. Please use tf.nn.avg_pool2d instead.
-
-  0%|          | 0/17 [00:00<?, ?it/s]We have 15 classes.
-Instantiating a InceptionV3
-  6%|▌         | 1/17 [00:09<02:38,  9.92s/it] 12%|█▏        | 2/17 [00:17<02:16,  9.10s/it] 18%|█▊        | 3/17 [00:24<01:59,  8.57s/it] 24%|██▎       | 4/17 [00:31<01:46,  8.20s/it] 29%|██▉       | 5/17 [00:39<01:35,  7.96s/it] 35%|███▌      | 6/17 [00:46<01:27,  7.91s/it] 41%|████      | 7/17 [00:55<01:22,  8.21s/it] 47%|████▋     | 8/17 [01:04<01:14,  8.26s/it] 53%|█████▎    | 9/17 [01:10<01:01,  7.71s/it] 59%|█████▉    | 10/17 [01:17<00:51,  7.37s/it] 65%|██████▍   | 11/17 [01:23<00:42,  7.12s/it] 71%|███████   | 12/17 [01:30<00:34,  6.95s/it] 76%|███████▋  | 13/17 [01:36<00:26,  6.75s/it] 82%|████████▏ | 14/17 [01:43<00:19,  6.64s/it] 88%|████████▊ | 15/17 [01:49<00:13,  6.60s/it] 94%|█████████▍| 16/17 [01:55<00:06,  6.54s/it]100%|██████████| 17/17 [01:59<00:00,  5.78s/it]100%|██████████| 17/17 [01:59<00:00,  7.05s/it]
-Using TensorFlow backend.
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/tensorflow_core/__init__.py:1473: The name tf.estimator.inputs is deprecated. Please use tf.compat.v1.estimator.inputs instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:74: The name tf.get_default_graph is deprecated. Please use tf.compat.v1.get_default_graph instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:517: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4138: The name tf.random_uniform is deprecated. Please use tf.random.uniform instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:174: The name tf.get_default_session is deprecated. Please use tf.compat.v1.get_default_session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:181: The name tf.ConfigProto is deprecated. Please use tf.compat.v1.ConfigProto instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:186: The name tf.Session is deprecated. Please use tf.compat.v1.Session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:190: The name tf.global_variables is deprecated. Please use tf.compat.v1.global_variables instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:199: The name tf.is_variable_initialized is deprecated. Please use tf.compat.v1.is_variable_initialized instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:206: The name tf.variables_initializer is deprecated. Please use tf.compat.v1.variables_initializer instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:1834: The name tf.nn.fused_batch_norm is deprecated. Please use tf.compat.v1.nn.fused_batch_norm instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:133: The name tf.placeholder_with_default is deprecated. Please use tf.compat.v1.placeholder_with_default instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3976: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
-
-We have 15 classes.
-Instantiating a Xception
-Downloading data from https://github.com/fchollet/deep-learning-models/releases/download/v0.4/xception_weights_tf_dim_ordering_tf_kernels_notop.h5
-
-    8192/83683744 [..............................] - ETA: 6s
- 4513792/83683744 [>.............................] - ETA: 0s
- 6668288/83683744 [=>............................] - ETA: 1s
-13336576/83683744 [===>..........................] - ETA: 0s
-17784832/83683744 [=====>........................] - ETA: 1s
-22921216/83683744 [=======>......................] - ETA: 0s
-30105600/83683744 [=========>....................] - ETA: 0s
-33374208/83683744 [==========>...................] - ETA: 0s
-35635200/83683744 [===========>..................] - ETA: 0s
-42885120/83683744 [==============>...............] - ETA: 0s
-44523520/83683744 [==============>...............] - ETA: 0s
-47185920/83683744 [===============>..............] - ETA: 0s
-53420032/83683744 [==================>...........] - ETA: 0s
-56090624/83683744 [===================>..........] - ETA: 0s
-59400192/83683744 [====================>.........] - ETA: 0s
-67248128/83683744 [=======================>......] - ETA: 0s
-71262208/83683744 [========================>.....] - ETA: 0s
-73457664/83683744 [=========================>....] - ETA: 0s
-76988416/83683744 [==========================>...] - ETA: 0s
-83017728/83683744 [============================>.] - ETA: 0s
-83689472/83683744 [==============================] - 1s 0us/step
-  0%|          | 0/17 [00:00<?, ?it/s]  6%|▌         | 1/17 [00:12<03:24, 12.75s/it] 12%|█▏        | 2/17 [00:23<03:00, 12.05s/it] 18%|█▊        | 3/17 [00:33<02:42, 11.60s/it] 24%|██▎       | 4/17 [00:44<02:27, 11.36s/it] 29%|██▉       | 5/17 [00:55<02:15, 11.27s/it] 35%|███▌      | 6/17 [01:06<02:03, 11.22s/it] 41%|████      | 7/17 [01:18<01:54, 11.47s/it] 47%|████▋     | 8/17 [01:30<01:43, 11.50s/it] 53%|█████▎    | 9/17 [01:40<01:28, 11.04s/it] 59%|█████▉    | 10/17 [01:50<01:14, 10.70s/it] 65%|██████▍   | 11/17 [02:00<01:02, 10.49s/it] 71%|███████   | 12/17 [02:10<00:51, 10.33s/it] 76%|███████▋  | 13/17 [02:19<00:40, 10.19s/it] 82%|████████▏ | 14/17 [02:29<00:30, 10.02s/it] 88%|████████▊ | 15/17 [02:39<00:19,  9.93s/it] 94%|█████████▍| 16/17 [02:49<00:10, 10.04s/it]100%|██████████| 17/17 [02:55<00:00,  8.66s/it]100%|██████████| 17/17 [02:55<00:00, 10.30s/it]
-Using TensorFlow backend.
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/tensorflow_core/__init__.py:1473: The name tf.estimator.inputs is deprecated. Please use tf.compat.v1.estimator.inputs instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:74: The name tf.get_default_graph is deprecated. Please use tf.compat.v1.get_default_graph instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:517: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4138: The name tf.random_uniform is deprecated. Please use tf.random.uniform instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:174: The name tf.get_default_session is deprecated. Please use tf.compat.v1.get_default_session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:181: The name tf.ConfigProto is deprecated. Please use tf.compat.v1.ConfigProto instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:186: The name tf.Session is deprecated. Please use tf.compat.v1.Session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:190: The name tf.global_variables is deprecated. Please use tf.compat.v1.global_variables instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:199: The name tf.is_variable_initialized is deprecated. Please use tf.compat.v1.is_variable_initialized instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:206: The name tf.variables_initializer is deprecated. Please use tf.compat.v1.variables_initializer instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:1834: The name tf.nn.fused_batch_norm is deprecated. Please use tf.compat.v1.nn.fused_batch_norm instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:133: The name tf.placeholder_with_default is deprecated. Please use tf.compat.v1.placeholder_with_default instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3976: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
-
-  0%|          | 0/17 [00:00<?, ?it/s]We have 15 classes.
-Instantiating a Xception
-  6%|▌         | 1/17 [00:12<03:19, 12.44s/it] 12%|█▏        | 2/17 [00:23<02:59, 11.94s/it] 18%|█▊        | 3/17 [00:33<02:41, 11.53s/it] 24%|██▎       | 4/17 [00:44<02:27, 11.31s/it] 29%|██▉       | 5/17 [00:55<02:13, 11.10s/it] 35%|███▌      | 6/17 [01:06<02:01, 11.07s/it] 41%|████      | 7/17 [01:18<01:54, 11.48s/it] 47%|████▋     | 8/17 [01:30<01:43, 11.50s/it] 53%|█████▎    | 9/17 [01:40<01:28, 11.05s/it] 59%|█████▉    | 10/17 [01:50<01:14, 10.68s/it] 65%|██████▍   | 11/17 [02:00<01:02, 10.50s/it] 71%|███████   | 12/17 [02:10<00:51, 10.38s/it] 76%|███████▋  | 13/17 [02:19<00:40, 10.20s/it] 82%|████████▏ | 14/17 [02:29<00:30, 10.12s/it] 88%|████████▊ | 15/17 [02:39<00:20, 10.09s/it] 94%|█████████▍| 16/17 [02:49<00:10, 10.02s/it]100%|██████████| 17/17 [02:55<00:00,  8.66s/it]100%|██████████| 17/17 [02:55<00:00, 10.31s/it]
-Using TensorFlow backend.
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/tensorflow_core/__init__.py:1473: The name tf.estimator.inputs is deprecated. Please use tf.compat.v1.estimator.inputs instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:74: The name tf.get_default_graph is deprecated. Please use tf.compat.v1.get_default_graph instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:517: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4185: The name tf.truncated_normal is deprecated. Please use tf.random.truncated_normal instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:174: The name tf.get_default_session is deprecated. Please use tf.compat.v1.get_default_session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:181: The name tf.ConfigProto is deprecated. Please use tf.compat.v1.ConfigProto instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:186: The name tf.Session is deprecated. Please use tf.compat.v1.Session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:190: The name tf.global_variables is deprecated. Please use tf.compat.v1.global_variables instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:199: The name tf.is_variable_initialized is deprecated. Please use tf.compat.v1.is_variable_initialized instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:206: The name tf.variables_initializer is deprecated. Please use tf.compat.v1.variables_initializer instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:1834: The name tf.nn.fused_batch_norm is deprecated. Please use tf.compat.v1.nn.fused_batch_norm instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:133: The name tf.placeholder_with_default is deprecated. Please use tf.compat.v1.placeholder_with_default instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4138: The name tf.random_uniform is deprecated. Please use tf.random.uniform instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3976: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3980: The name tf.nn.avg_pool is deprecated. Please use tf.nn.avg_pool2d instead.
-
-We have 15 classes.
-Instantiating a NASNet
-Downloading data from https://github.com/titu1994/Keras-NASNet/releases/download/v1.2/NASNet-large-no-top.h5
-
-     8192/343610240 [..............................] - ETA: 5s
-  5545984/343610240 [..............................] - ETA: 3s
- 12230656/343610240 [>.............................] - ETA: 2s
- 18857984/343610240 [>.............................] - ETA: 2s
- 24993792/343610240 [=>............................] - ETA: 2s
- 29802496/343610240 [=>............................] - ETA: 2s
- 36167680/343610240 [==>...........................] - ETA: 3s
- 38551552/343610240 [==>...........................] - ETA: 3s
- 42237952/343610240 [==>...........................] - ETA: 3s
- 47325184/343610240 [===>..........................] - ETA: 3s
- 53420032/343610240 [===>..........................] - ETA: 3s
- 57581568/343610240 [====>.........................] - ETA: 3s
- 62832640/343610240 [====>.........................] - ETA: 3s
- 68583424/343610240 [====>.........................] - ETA: 3s
- 74276864/343610240 [=====>........................] - ETA: 3s
- 79503360/343610240 [=====>........................] - ETA: 3s
- 86433792/343610240 [======>.......................] - ETA: 2s
- 88129536/343610240 [======>.......................] - ETA: 3s
- 89055232/343610240 [======>.......................] - ETA: 3s
- 95027200/343610240 [=======>......................] - ETA: 3s
-100671488/343610240 [=======>......................] - ETA: 3s
-103055360/343610240 [=======>......................] - ETA: 3s
-106905600/343610240 [========>.....................] - ETA: 3s
-109699072/343610240 [========>.....................] - ETA: 3s
-114769920/343610240 [=========>....................] - ETA: 3s
-121323520/343610240 [=========>....................] - ETA: 3s
-125026304/343610240 [=========>....................] - ETA: 3s
-129392640/343610240 [==========>...................] - ETA: 3s
-136454144/343610240 [==========>...................] - ETA: 2s
-138166272/343610240 [===========>..................] - ETA: 3s
-142548992/343610240 [===========>..................] - ETA: 2s
-146472960/343610240 [===========>..................] - ETA: 2s
-152338432/343610240 [============>.................] - ETA: 2s
-160448512/343610240 [=============>................] - ETA: 2s
-164290560/343610240 [=============>................] - ETA: 2s
-169951232/343610240 [=============>................] - ETA: 2s
-174800896/343610240 [==============>...............] - ETA: 2s
-180469760/343610240 [==============>...............] - ETA: 2s
-185458688/343610240 [===============>..............] - ETA: 2s
-191971328/343610240 [===============>..............] - ETA: 2s
-197844992/343610240 [================>.............] - ETA: 2s
-205127680/343610240 [================>.............] - ETA: 1s
-206651392/343610240 [=================>............] - ETA: 2s
-211632128/343610240 [=================>............] - ETA: 2s
-213819392/343610240 [=================>............] - ETA: 2s
-215015424/343610240 [=================>............] - ETA: 2s
-218472448/343610240 [==================>...........] - ETA: 1s
-220790784/343610240 [==================>...........] - ETA: 2s
-225361920/343610240 [==================>...........] - ETA: 1s
-229670912/343610240 [===================>..........] - ETA: 1s
-234094592/343610240 [===================>..........] - ETA: 1s
-239828992/343610240 [===================>..........] - ETA: 1s
-248020992/343610240 [====================>.........] - ETA: 1s
-251052032/343610240 [====================>.........] - ETA: 1s
-257318912/343610240 [=====================>........] - ETA: 1s
-259211264/343610240 [=====================>........] - ETA: 1s
-264560640/343610240 [======================>.......] - ETA: 1s
-265117696/343610240 [======================>.......] - ETA: 1s
-267247616/343610240 [======================>.......] - ETA: 1s
-270974976/343610240 [======================>.......] - ETA: 1s
-279756800/343610240 [=======================>......] - ETA: 1s
-280584192/343610240 [=======================>......] - ETA: 1s
-282230784/343610240 [=======================>......] - ETA: 1s
-282574848/343610240 [=======================>......] - ETA: 1s
-285097984/343610240 [=======================>......] - ETA: 1s
-285630464/343610240 [=======================>......] - ETA: 1s
-287023104/343610240 [========================>.....] - ETA: 1s
-293404672/343610240 [========================>.....] - ETA: 0s
-298008576/343610240 [=========================>....] - ETA: 0s
-302882816/343610240 [=========================>....] - ETA: 0s
-305471488/343610240 [=========================>....] - ETA: 0s
-307658752/343610240 [=========================>....] - ETA: 0s
-313303040/343610240 [==========================>...] - ETA: 0s
-315686912/343610240 [==========================>...] - ETA: 0s
-320733184/343610240 [===========================>..] - ETA: 0s
-324845568/343610240 [===========================>..] - ETA: 0s
-327639040/343610240 [===========================>..] - ETA: 0s
-332414976/343610240 [============================>.] - ETA: 0s
-338518016/343610240 [============================>.] - ETA: 0s
-342966272/343610240 [============================>.] - ETA: 0s
-343613440/343610240 [==============================] - 8s 0us/step
-  0%|          | 0/17 [00:00<?, ?it/s]  6%|▌         | 1/17 [01:07<18:00, 67.53s/it] 12%|█▏        | 2/17 [02:04<16:03, 64.24s/it] 18%|█▊        | 3/17 [03:01<14:28, 62.06s/it] 24%|██▎       | 4/17 [03:58<13:07, 60.58s/it] 29%|██▉       | 5/17 [04:54<11:52, 59.39s/it] 35%|███▌      | 6/17 [05:51<10:45, 58.70s/it] 41%|████      | 7/17 [06:49<09:44, 58.42s/it] 47%|████▋     | 8/17 [07:47<08:43, 58.19s/it] 53%|█████▎    | 9/17 [08:43<07:40, 57.62s/it] 59%|█████▉    | 10/17 [09:40<06:41, 57.39s/it] 65%|██████▍   | 11/17 [10:37<05:42, 57.16s/it] 71%|███████   | 12/17 [11:33<04:44, 56.90s/it] 76%|███████▋  | 13/17 [12:29<03:47, 56.76s/it] 82%|████████▏ | 14/17 [13:26<02:50, 56.79s/it] 88%|████████▊ | 15/17 [14:22<01:53, 56.65s/it] 94%|█████████▍| 16/17 [15:19<00:56, 56.72s/it]100%|██████████| 17/17 [15:46<00:00, 47.71s/it]100%|██████████| 17/17 [15:46<00:00, 55.68s/it]
-Using TensorFlow backend.
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/tensorflow_core/__init__.py:1473: The name tf.estimator.inputs is deprecated. Please use tf.compat.v1.estimator.inputs instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:74: The name tf.get_default_graph is deprecated. Please use tf.compat.v1.get_default_graph instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:517: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4185: The name tf.truncated_normal is deprecated. Please use tf.random.truncated_normal instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:174: The name tf.get_default_session is deprecated. Please use tf.compat.v1.get_default_session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:181: The name tf.ConfigProto is deprecated. Please use tf.compat.v1.ConfigProto instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:186: The name tf.Session is deprecated. Please use tf.compat.v1.Session instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:190: The name tf.global_variables is deprecated. Please use tf.compat.v1.global_variables instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:199: The name tf.is_variable_initialized is deprecated. Please use tf.compat.v1.is_variable_initialized instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:206: The name tf.variables_initializer is deprecated. Please use tf.compat.v1.variables_initializer instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:1834: The name tf.nn.fused_batch_norm is deprecated. Please use tf.compat.v1.nn.fused_batch_norm instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:133: The name tf.placeholder_with_default is deprecated. Please use tf.compat.v1.placeholder_with_default instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:4138: The name tf.random_uniform is deprecated. Please use tf.random.uniform instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3976: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
-
-WARNING:tensorflow:From /home/ubuntu/anaconda3/envs/tensorflow_p36/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py:3980: The name tf.nn.avg_pool is deprecated. Please use tf.nn.avg_pool2d instead.
-
-  0%|          | 0/17 [00:00<?, ?it/s]We have 15 classes.
-Instantiating a NASNet
-  6%|▌         | 1/17 [01:05<17:29, 65.58s/it] 12%|█▏        | 2/17 [02:00<15:35, 62.34s/it] 18%|█▊        | 3/17 [02:55<14:03, 60.28s/it] 24%|██▎       | 4/17 [03:51<12:44, 58.77s/it] 29%|██▉       | 5/17 [04:46<11:33, 57.78s/it] 35%|███▌      | 6/17 [05:42<10:28, 57.14s/it] 41%|████      | 7/17 [06:38<09:29, 56.92s/it] 47%|████▋     | 8/17 [07:34<08:30, 56.68s/it] 53%|█████▎    | 9/17 [08:29<07:29, 56.21s/it] 59%|█████▉    | 10/17 [09:24<06:31, 55.89s/it] 65%|██████▍   | 11/17 [10:20<05:34, 55.71s/it] 71%|███████   | 12/17 [11:15<04:37, 55.60s/it] 76%|███████▋  | 13/17 [12:10<03:41, 55.49s/it] 82%|████████▏ | 14/17 [13:05<02:46, 55.37s/it] 88%|████████▊ | 15/17 [14:01<01:50, 55.39s/it] 94%|█████████▍| 16/17 [14:56<00:55, 55.34s/it]100%|██████████| 17/17 [15:22<00:00, 46.59s/it]100%|██████████| 17/17 [15:22<00:00, 54.28s/it]

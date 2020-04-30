@@ -46,13 +46,13 @@ def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
                     bbox_inches='tight')
         plt.close()
 
-def plot_confusion(true, pred, backbone, pooling):
+def plot_confusion(true, pred, backbone, pooling, keyword):
     confmat = confusion_matrix(true, pred)
     plt.figure(figsize=(8,6), dpi=200)
     sns.heatmap(confmat, cmap="plasma", annot=True, fmt='d')
     plt.xlabel('Cluster Label')
     plt.ylabel('Truth Label')
-    plt.savefig('figures/confusion_{}_{}.png'.format(backbone, pooling),
+    plt.savefig('figures/confusion_{}_{}_{}.png'.format(keyword, backbone, pooling),
                 bbox_inches='tight')
     plt.close()
 
@@ -75,10 +75,13 @@ if __name__ == "__main__":
         assignment = hungarian_method(data[csvfile]['label_code'], data[csvfile]['cluster'])
 
         plot_confusion(data[csvfile]['label_code'], data[csvfile]['cluster'],
-                       backbone, pooling)
+                       backbone, pooling, 'before_mapping')
         
         for pair in assignment:
             data[csvfile]['cluster'].replace(pair[0], pair[1], inplace=True)
+
+        plot_confusion(data[csvfile]['label_code'], data[csvfile]['cluster'],
+                       backbone, pooling, 'after_mapping')
 
         weight_acc = balanced_accuracy_score(data[csvfile]['label_code'], data[csvfile]['cluster'])
         print("Balanced Accuracy Score: {0:8.6f}".format(weight_acc))

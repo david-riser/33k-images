@@ -15,7 +15,7 @@ def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
     """ 
     Create a figure for the visualization of clustering results. 
     """
-    side_len = int(np.ceil(np.sqrt(len(data))))
+    side_len = int(np.ceil(np.sqrt(len(true_label_sorted_data))))
     n_classes = true_label_sorted_data['label_code'].nunique()
 
     # Create images

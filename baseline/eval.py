@@ -95,7 +95,7 @@ if __name__ == "__main__":
         plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data, backbone, pooling)
 
     # Create a bar chart with ARS
-    plt.figure(figsize=(12,12))
+    plt.figure(figsize=(8,6))
     plt.barh(
         list(name_lut.values()),
         list(rand_index.values()),
@@ -105,5 +105,5 @@ if __name__ == "__main__":
     plt.title('Image Clusters w/ Transfer Learning (untuned)')
     plt.xlabel('Adjusted Rand Index')
     plt.xlim([0.0, 0.4])
-    plt.savefig('figures/rand_barh.png', bbox_inches='tight', dpi=50)
+    plt.savefig('figures/rand_barh.png', bbox_inches='tight', dpi=100)
     plt.close()

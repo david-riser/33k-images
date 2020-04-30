@@ -33,7 +33,7 @@ def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
                 not_ideal_figure[row, col] = pred_label_sorted_data['label_code'].values[index]
 
     # Create the map from ideal points
-    for cmap in ['spectral', 'jet']:
+    for cmap in ['Spectral', 'jet']:
         plt.figure(figsize=(16,6), dpi=100)
         plt.subplot(1, 2, 1)
         plt.imshow(ideal_figure, cmap=plt.cm.get_cmap(cmap, n_classes))
@@ -63,7 +63,7 @@ if __name__ == "__main__":
         assignment = hungarian_method(data[csvfile]['label_code'], data[csvfile]['cluster'])
 
         for pair in assignment:
-            data[csvfile]['cluster'].replace(pair[0], pair[1])
+            data[csvfile]['cluster'].replace(pair[1], pair[0], inplace=True)
         
         rand_index[csvfile] = adjusted_rand_score(
             data[csvfile]['label_code'].values, data[csvfile]['cluster'].values)

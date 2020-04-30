@@ -1,7 +1,6 @@
 import numpy as np
 
 from sklearn.utils.linear_assignment_ import linear_assignment
-from sklearn.metrics import confusion_matrix
 
 def hungarian_method(y_true, y_pred):
 
@@ -14,7 +13,3 @@ def hungarian_method(y_true, y_pred):
 
     ind = linear_assignment(w.max() - w)
     return ind
-
-def hungarian_method2(y_true, y_pred):
-    confusion = confusion_matrix(y_true, y_pred)
-    return linear_assignment(confusion.max() - confusion)

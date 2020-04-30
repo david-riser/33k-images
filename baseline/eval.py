@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
+import seaborn as sns
 
 # Some clustering utilities 
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import adjusted_rand_score, confusion_matrix
-from metrics import hungarian_method, hungarian_method2
+from sklearn.metrics import adjusted_rand_score, accuracy_score, balanced_accuracy_score, confusion_matrix
+from metrics import hungarian_method
 
 def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
                      backbone, pooling):
@@ -45,6 +46,17 @@ def plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data,
                     bbox_inches='tight')
         plt.close()
 
+def plot_confusion(true, pred, backbone, pooling):
+    confmat = confusion_matrix(true, pred)
+    plt.figure(figsize=(8,6), dpi=200)
+    sns.heatmap(confmat, cmap="plasma", annot=True, fmt='d')
+    plt.xlabel('Cluster Label')
+    plt.ylabel('Truth Label')
+    plt.savefig('figures/confusion_{}_{}.png'.format(backbone, pooling),
+                bbox_inches='tight')
+    plt.close()
+
+    
 if __name__ == "__main__":
 
     input_folder = './artifacts'
@@ -62,13 +74,18 @@ if __name__ == "__main__":
         data[csvfile]['label_code'] = encoder.fit_transform(data[csvfile]['label'].values)
         assignment = hungarian_method(data[csvfile]['label_code'], data[csvfile]['cluster'])
 
+        plot_confusion(data[csvfile]['label_code'], data[csvfile]['cluster'],
+                       backbone, pooling)
+        
         for pair in assignment:
             data[csvfile]['cluster'].replace(pair[0], pair[1], inplace=True)
-        
+
+        weight_acc = balanced_accuracy_score(data[csvfile]['label_code'], data[csvfile]['cluster'])
+        print("Balanced Accuracy Score: {0:8.6f}".format(weight_acc))
         rand_index[csvfile] = adjusted_rand_score(
             data[csvfile]['label_code'].values, data[csvfile]['cluster'].values)
         print("Adjusted Rand Score ({0}): {1:8.6f}".format(csvfile, rand_index[csvfile]))
-
+        
         true_label_sorted_data = data[csvfile].sort_values('label_code')
         pred_label_sorted_data = data[csvfile].sort_values('cluster')
         plot_cluster_viz(true_label_sorted_data, pred_label_sorted_data, backbone, pooling)

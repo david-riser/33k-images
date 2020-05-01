@@ -1,0 +1,15 @@
+{
+    "data": [
+        {
+            "quantity": "Boxes",
+            "occurances": 3,
+            "estimated_probability": 0.004464285714285714
+        },
+        {
+            "quantity": "Blank",
+            "occurances": 5,
+            "estimated_probability": 0.00744047619047619
+        }
+    ],
+    "total": 672
+}

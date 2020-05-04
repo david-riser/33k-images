@@ -39,6 +39,8 @@ def plot_loss(history, name):
     plt.plot(history.history['loss'], marker='o', label='Train', color='blue')
     plt.plot(history.history['val_loss'], marker='o', label='Valid', color='red')
     plt.grid(alpha=0.2)
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
     plt.legend(frameon=False, loc='upper left')
     plt.savefig('figures/{}_loss.png'.format(name), bbox_inches='tight')
 
@@ -50,8 +52,10 @@ def plot_metrics(history, name):
     for metric in list_metrics(history):
         plt.figure(figsize=(8,6))
         plt.plot(history.history[metric], marker='o', label=metric, color='blue')
-        plt.plot(history.history['val_' + metric], marker='o', label=metric, color='red')
+        plt.plot(history.history['val_' + metric], marker='o',
+                 label='Val. {}'.format(metric), color='red')
         plt.grid(alpha=0.2)
+        plt.xlabel('Epoch')
         plt.legend(frameon=False, loc='upper left')
         plt.savefig('figures/{}_{}.png'.format(name, metric), bbox_inches='tight')
         plt.close()
@@ -169,5 +173,5 @@ if __name__ == "__main__":
     # Plot metrics
     plot_loss(history=history, name='stage1')
     plot_loss(history=history, name='stage2')
-    plot_metrics(history=history, name='stage1')
-    plot_metrics(history=history, name='stage2')
+    plot_metrics(history=history_stage2, name='stage1')
+    plot_metrics(history=history_stage2, name='stage2')

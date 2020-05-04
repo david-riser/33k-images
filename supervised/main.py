@@ -172,6 +172,6 @@ if __name__ == "__main__":
     
     # Plot metrics
     plot_loss(history=history, name='stage1')
-    plot_loss(history=history, name='stage2')
-    plot_metrics(history=history_stage2, name='stage1')
+    plot_loss(history=history_stage2, name='stage2')
+    plot_metrics(history=history, name='stage1')
     plot_metrics(history=history_stage2, name='stage2')

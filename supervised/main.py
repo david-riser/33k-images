@@ -47,16 +47,26 @@ def plot_metrics(history, name):
     if not os.path.exists('figures'):
         os.mkdir('figures')
 
-    plt.figure(figsize=(8,6))
+    for metric in list_metrics(history):
+        plt.figure(figsize=(8,6))
+        plt.plot(history.history[metric], marker='o', label=metric, color='blue')
+        plt.plot(history.history['val_' + metric], marker='o', label=metric, color='red')
+        plt.grid(alpha=0.2)
+        plt.legend(frameon=False, loc='upper left')
+        plt.savefig('figures/{}_{}.png'.format(name, metric), bbox_inches='tight')
+        plt.close()
 
-    for metric in history.history.keys():
-        if 'loss' not in metric:
-            plt.plot(history.history[metric], marker='o', label=metric)
+def list_metrics(history):
+    metrics = []
 
-    plt.grid(alpha=0.2)
-    plt.legend(frameon=False, loc='upper left')
-    plt.savefig('figures/{}_metrics.png'.format(name), bbox_inches='tight')
+    prohibited = ['loss', 'lr', 'val']
+    for key in history.history.keys():
+        keep = not any([p in key for p in prohibited])
+        if keep:
+            metrics.append(key)
 
+    return metrics
+        
 if __name__ == "__main__":
 
     args = get_args()

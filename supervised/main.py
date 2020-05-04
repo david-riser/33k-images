@@ -24,12 +24,6 @@ def get_args():
     ap.add_argument('--base_dir', type=str, required=True)
     return ap.parse_args()
 
-def preprocess(x):
-    print('[DEBUG] preprocess start {}'.format(x.shape))
-    x = np.expand_dims(x, axis=0)
-    print('[DEBUG] preprocess start (expanded) {}'.format(x.shape))
-    return preprocess_input(x)
-
 def plot_loss(history, name):
     """ Plot training and validation loss. """
     if not os.path.exists('figures'):
@@ -81,10 +75,12 @@ if __name__ == "__main__":
         'max_epochs':args.max_epochs,
     }
 
-    # Load and shuffle image path
+    # Load and shuffle image path.  Also
+    # encode the labels as integers for
+    # ease of metric calculation later.
     images = pd.read_csv(args.images)
     images = images.sample(frac=1).reset_index(drop=True)
-
+    
     # Calculate shapes for training
     input_shape = (224,224,3)
     output_shape = images['label'].nunique()
@@ -93,9 +89,6 @@ if __name__ == "__main__":
     
     # Build generators
     split = int(0.9 * len(images))
-
-    # Save validation folds
-    images.to_csv('validation_images.csv', index=False)
 
     augmentations = dict(
         rotation_range=20,
@@ -113,21 +106,26 @@ if __name__ == "__main__":
         directory=args.base_dir,
         batch_size=params['batch_size'],
         target_size=input_shape[:2],
-        class_mode='categorical',
         shuffle=True,
         x_col='file',
-        y_col='label'
+        y_col='label',
+        class_mode='categorical'
     )
     valid_flow = valid_gen.flow_from_dataframe(
         dataframe=images[split:],
         directory=args.base_dir,
         batch_size=params['batch_size'],
         target_size=input_shape[:2],
-        class_mode='categorical',
         shuffle=True,
         x_col='file',
-        y_col='label'
+        y_col='label',
+        class_mode='categorical'
     )
+
+    # Save validation folds with class encoded value
+    encoding = train_flow.class_indices
+    images['encoded_label'] = images['label'].apply(lambda x: encoding[x])
+    images.to_csv('validation_images.csv', index=False)
 
     # Build model and freeze most of it.
     model = build_model(input_shape, output_shape)

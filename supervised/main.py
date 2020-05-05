@@ -22,6 +22,7 @@ def get_args():
     ap.add_argument('--max_epochs', type=int, default=5)
     ap.add_argument('--images', type=str, required=True)
     ap.add_argument('--base_dir', type=str, required=True)
+    ap.add_argument('--experiment', type=str, required=True)
     return ap.parse_args()
 
 def plot_loss(history, name):
@@ -125,7 +126,7 @@ if __name__ == "__main__":
     # Save validation folds with class encoded value
     encoding = train_flow.class_indices
     images['encoded_label'] = images['label'].apply(lambda x: encoding[x])
-    images.to_csv('validation_images.csv', index=False)
+    images.to_csv('validation_images_{}.csv'.format(args.experiment), index=False)
 
     # Build model and freeze most of it.
     model = build_model(input_shape, output_shape)
@@ -135,7 +136,7 @@ if __name__ == "__main__":
     for layer in model.layers[-2:]:
         layer.trainable = True
 
-    model_checkpoint = ModelCheckpoint(filepath='weights.hdf5',
+    model_checkpoint = ModelCheckpoint(filepath='weights_{}.hdf5'.format(args.experiment),
                                        monitor='val_loss')
     early_stopping = EarlyStopping(monitor='val_loss', patience=12)
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=6)
@@ -152,7 +153,7 @@ if __name__ == "__main__":
 
 
     # Train the entire network
-    model = load_model('weights.hdf5')
+    model = load_model('weights_{}.hdf5'.format(args.experiment))
 
     for layer in model.layers:
         layer.trainable = True
@@ -163,13 +164,19 @@ if __name__ == "__main__":
         metrics=metrics
     )
 
-    model_checkpoint = ModelCheckpoint(filepath='weights_stage2.hdf5', monitor='val_loss')
+    model_checkpoint = ModelCheckpoint(filepath='weights_stage2_{}.hdf5'.format(args.experiment),
+                                       monitor='val_loss')
     callbacks = [model_checkpoint, early_stopping, reduce_lr]
     history_stage2 = model.fit_generator(train_flow, steps_per_epoch=50, epochs=args.max_epochs,
                                          validation_data=valid_flow, workers=4, callbacks=callbacks)
+
+    # Combine history
+    for key in history.history.keys():
+        if key in history_stage2.history.keys():
+            history.history[key].extend(
+                history_stage2.history[key]
+            )
     
     # Plot metrics
-    plot_loss(history=history, name='stage1')
-    plot_loss(history=history_stage2, name='stage2')
-    plot_metrics(history=history, name='stage1')
-    plot_metrics(history=history_stage2, name='stage2')
+    plot_loss(history=history, name=args.experiment)
+    plot_metrics(history=history, name=args.experiment)

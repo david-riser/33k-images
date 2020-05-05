@@ -28,12 +28,13 @@ def get_args():
     add_required_str_arg(parser, 'model')
     add_required_str_arg(parser, 'data')
     add_required_str_arg(parser, 'images')
+    add_required_str_arg(parser, 'experiment')
 
     return parser.parse_args()
 
 def plot_confusion_matrix(labels, preds, name):
     cm = confusion_matrix(labels, preds)
-    plt.figure(figsize=(8,6))
+    plt.figure(figsize=(16,12))
     sns.heatmap(cm, annot=True, fmt='d')
     plt.savefig(name, bbox_inches='tight', dpi=100)
 
@@ -73,7 +74,8 @@ def main(args):
     if not os.path.exists('figures'):
         os.mkdir('figures')
         
-    plot_confusion_matrix(images['encoded_label'].values, preds, 'figures/confusion_matrix.png')
+    plot_confusion_matrix(images['encoded_label'].values, preds,
+                          'figures/{}_confusion_matrix.png'.format(args.experiment))
     
 if __name__ == '__main__':
     main(get_args())

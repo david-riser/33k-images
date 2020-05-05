@@ -6,9 +6,10 @@ data = {}
 folders = 0
 count = 0 
 for folder, _, files in os.walk('../../work_images'):
-    folders += 1
-    count += len(files)
-    data[folder] = len(files)
+    if 'tesseract' not in folder and 'lists' not in folder and 'scripts' not in folder:
+        folders += 1
+        count += len(files)
+        data[folder] = len(files)
 
 print(folders, count)
 
@@ -17,7 +18,7 @@ images = np.array(list(data.values()))
 indices = np.argsort(images)[::-1]
 running = 0
 
-for i in indices[:80]:
+for i in indices:
     running += images[i]
     print("{0} ({1}): {2}/{3} {4:6.4f}%".format(folders[i], images[i],
-                                      running, count, 100 * float(running/count)))
+                                                running, count, 100 * float(running/count)))

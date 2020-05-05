@@ -33,8 +33,14 @@ def get_args():
     return parser.parse_args()
 
 def plot_confusion_matrix(labels, preds, name):
+
+    if len(labels) < 20:
+        figsize = (16,12)
+    else:
+        figsize = (32,24)
+
     cm = confusion_matrix(labels, preds)
-    plt.figure(figsize=(16,12))
+    plt.figure(figsize=figsize)
     sns.heatmap(cm, annot=True, fmt='d')
     plt.savefig(name, bbox_inches='tight', dpi=100)
 

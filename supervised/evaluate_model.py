@@ -44,6 +44,41 @@ def plot_confusion_matrix(labels, preds, name):
     sns.heatmap(cm, annot=True, fmt='d')
     plt.savefig(name, bbox_inches='tight', dpi=100)
 
+def plot_pr(labels, preds, name):
+
+    cm = confusion_matrix(labels, preds)
+    rows, _ = cm.shape
+
+    classes = np.arange(rows)
+    recall = []
+    precision = []
+    for i in range(rows):
+        true_positives = cm[i,i]
+        total_true = np.sum(cm[i,:])
+        total_pred = np.sum(cm[:,i])
+        recall.append(float(true_positives / total_true))
+        precision.append(float(true_positives / total_pred))
+
+    if len(labels) < 20:
+        figsize=(6,12)
+    else:
+        figsize=(12,24)
+        
+    plt.figure(figsize=figsize)
+    plt.barh(classes, recall, edgecolor='k', color='red')
+    plt.xlabel('Class')
+    plt.ylabel('Recall')
+    plt.savefig(name + 'recall.png', bbox_inches='tight', dpi=100)
+    plt.close()
+        
+    plt.figure(figsize=figsize)
+    plt.barh(classes, precision, edgecolor='k', color='red')
+    plt.xlabel('Class')
+    plt.ylabel('Precision')
+    plt.savefig(name + 'precision.png', bbox_inches='tight', dpi=100)
+    plt.close()
+
+    
 def main(args):
     """ 
     Load images and model from main.py.  Use those
@@ -82,6 +117,8 @@ def main(args):
         
     plot_confusion_matrix(images['encoded_label'].values, preds,
                           'figures/{}_confusion_matrix.png'.format(args.experiment))
+    plot_pr(images['encoded_label'].values, preds,
+            'figures/{}_'.format(args.experiment))
     
 if __name__ == '__main__':
     main(get_args())

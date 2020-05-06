@@ -62,13 +62,15 @@ def plot_pr(labels, preds, name):
         support.append(total_true)
         
 
-    plt.figure(figsize=(16,12))
+    plt.figure(figsize=(8,6))
     plt.scatter(support, recall, edgecolor='k',
                 color='red', label='Recall')
     plt.scatter(support, precision, edgecolor='k',
                 color='blue', label='Precision')
+    plt.grid(alpha=0.2)
     plt.xlabel('Support')
     plt.ylabel('Value')
+    plt.legend(frameon=False)
     plt.savefig(name, bbox_inches='tight', dpi=100)
     plt.close()
 

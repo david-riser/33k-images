@@ -52,30 +52,24 @@ def plot_pr(labels, preds, name):
     classes = np.arange(rows)
     recall = []
     precision = []
+    support = []
     for i in range(rows):
         true_positives = cm[i,i]
         total_true = np.sum(cm[i,:])
         total_pred = np.sum(cm[:,i])
         recall.append(float(true_positives / total_true))
         precision.append(float(true_positives / total_pred))
+        support.append(total_true)
+        
 
-    if len(labels) < 20:
-        figsize=(6,12)
-    else:
-        figsize=(12,24)
-        
-    plt.figure(figsize=figsize)
-    plt.barh(classes, recall, edgecolor='k', color='red')
-    plt.xlabel('Class')
-    plt.ylabel('Recall')
-    plt.savefig(name + 'recall.png', bbox_inches='tight', dpi=100)
-    plt.close()
-        
-    plt.figure(figsize=figsize)
-    plt.barh(classes, precision, edgecolor='k', color='red')
-    plt.xlabel('Class')
-    plt.ylabel('Precision')
-    plt.savefig(name + 'precision.png', bbox_inches='tight', dpi=100)
+    plt.figure(figsize=(16,12))
+    plt.scatter(support, recall, edgecolor='k',
+                color='red', label='Recall')
+    plt.scatter(support, precision, edgecolor='k',
+                color='blue', label='Precision')
+    plt.xlabel('Support')
+    plt.ylabel('Value')
+    plt.savefig(name, bbox_inches='tight', dpi=100)
     plt.close()
 
     
@@ -118,7 +112,7 @@ def main(args):
     plot_confusion_matrix(images['encoded_label'].values, preds,
                           'figures/{}_confusion_matrix.png'.format(args.experiment))
     plot_pr(images['encoded_label'].values, preds,
-            'figures/{}_'.format(args.experiment))
+            'figures/{}_pr_scatter.png'.format(args.experiment))
     
 if __name__ == '__main__':
     main(get_args())

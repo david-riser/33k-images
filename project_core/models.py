@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.cluster import KMeans
 from tensorflow.keras import backend as K
+from tensorflow.keras import Model
 from tensorflow.keras.applications import (inception_v3,
                                            nasnet, resnet50,
                                            xception)
@@ -101,10 +102,11 @@ class ClusteringLayer(Layer):
         base_config = super(ClusteringLayer, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
-class PretrainedDeepClusteringModel:
+class PretrainedDeepClusteringModel(Model):
 
     """ Maybe this should inherit from Model. """
-    def __init__(self, input_size, n_clusters, backbone, lr=0.001):
+    def __init__(self, n_clusters, backbone):
+        super(PretrainedDeepClusteringModel, self).__init__()
         self.n_clusters = n_clusters
         self.lr = lr
         self.optimizer = Adam(self.lr)

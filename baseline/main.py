@@ -78,17 +78,22 @@ if __name__ == "__main__":
     # Setup output
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
-    
+
+    # Build the model and import the correct pre-processing
+    # function.  Each model uses a different function.
+    # Maybe they're the same under the hood because
+    # they are all trained with imagenet (something to look
+    # into).
     model, preprocess_input = model_factory(args.backbone, args.pooling)
     n_features = model.output.shape[1].value
     features = np.zeros((len(image_df), n_features))
+
     if args.backbone == "NASNet":
         target_size = (331,331)
     else:
         target_size = (224,224)
 
     image_loader = partial(load_image, target_size=target_size)
-    #for i in tqdm.tqdm(range(len(image_df))):
 
     batch_size = 1024
     batches = int(np.ceil(len(image_df) / batch_size))
@@ -97,7 +102,9 @@ if __name__ == "__main__":
         features[i*batch_size : (i+1)*batch_size,:] = predict_images(
             model, test_images, preprocess_input, args.cores, image_loader
         )
-    
+
+    # Cluster the results in feature space.  This takes quite a lot
+    # of memory (depending on the number of input images).
     kmeans = KMeans(n_clusters=n_classes)
     clusters = kmeans.fit_predict(features)
     pd.DataFrame(

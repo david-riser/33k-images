@@ -104,46 +104,38 @@ class ClusteringLayer(Layer):
 
 class PretrainedDeepClusteringModel(Model):
 
-    """ Maybe this should inherit from Model. """
     def __init__(self, n_clusters, backbone):
         super(PretrainedDeepClusteringModel, self).__init__()
+        self.backbone = backbone
         self.n_clusters = n_clusters
-        self.lr = lr
-        self.optimizer = Adam(self.lr)
-        self.is_compiled_ = False
         self.is_initialized_ = False
 
         # Create the clustering layer and build the model as
         # the pretrained network plus the clustering layer.
-        clustering_layer = ClusteringLayer(n_clusters=n_clusters, name='clustering')
-        self.model_ = Model(backbone.input, clustering_layer)
+        self.clustering_layer = ClusteringLayer(
+            n_clusters=n_clusters, name='clustering')
+        self.clustering_layer.trainable = True
 
-    def initialize_clusters(self, x):
-        """
-        Run KMeans on the input data and setup
-        a good starting point for clusters.
-        """
-        kmeans = KMeans(n_clusters=self.n_clusters)
-        kmeans.fit(x)
-        self.model_.get_layer(name='clustering').set_weights(
-            [kmeans.cluster_centers_]
-        )
-        self.is_initialized_ = True
-
-    def compile(self):
-        self.model_.compile(optimizer=self.optimizer, loss='kld')
-        self.is_compiled_ = True
-
-    def predict(self, x, **kwargs):
-        return self.model_.predict(x, **kwargs)
-
-    def train_on_batch(self, x, y, **kwargs):
-        return self.model_.train_on_batch(x, y, **kwargs)
-
-    @property
-    def is_compiled(self):
-        return self.is_compiled_
+    def call(self, inputs):
+        x = self.backbone(inputs)
+        output = self.clustering_layer(x)
+        return output
 
     @property
     def is_initialized(self):
         return self.is_initialized_
+
+    def initialize_clusters(self, x):
+        """
+        Run KMeans on the input data and setup
+        a good starting point for clusters.  First,
+        the data is transformed into the latent space
+        by calling the backbone.
+        """
+        z = self.backbone.predict(x)
+        kmeans = KMeans(n_clusters=self.n_clusters)
+        kmeans.fit(z)
+        self.model_.get_layer(name='clustering').set_weights(
+            [kmeans.cluster_centers_]
+        )
+        self.is_initialized_ = True

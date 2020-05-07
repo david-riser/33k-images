@@ -63,7 +63,7 @@ def create_directory(path, recursive=False):
 
     return True
 
-def cluster_target_distribution(q):
+def clustering_target_distribution(q):
     """
     This is an empirical function used to define good
     cluster centers in the deep clustering scheme.

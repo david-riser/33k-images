@@ -26,26 +26,7 @@ def train_clustering_model(model, X_train, max_iter,
 
     :returns kld_loss: A list of loss values throughout the training.
     """
-
-    if not isinstance(model, PretrainedDeepClusteringModel):
-        raise ValueError(("train_clustering_model expects to be passed an"
-                          " instance of project_core.models.PretrainedDeepClusteringModel."))
-
-    if not model.is_initialized:
-        if verbose:
-            print(("[INFO] project_core.train.train_clustering_model is initializing"
-                   " your model for you.  This can also be done manually with the "
-                   "model.initialize_clusters() method before calling the training function."))
-        model.initialize_clusters(X_train)
-
-    if not model.is_compiled:
-        if verbose:
-            print(("[INFO] project_core.train.train_clustering_model is compiling"
-                   " your model for you.  This can also be done manually with the "
-                   "model.compile() method before calling the training function."))
-        model.compile()
-
-    coverage_fraction = float(X_train.shape[0] / (batch_size * max_iter))
+    coverage_fraction = float((batch_size * max_iter) / X_train.shape[0])
     if coverage_fraction < 1.0:
         print(("[WARNING] project_core.train.train_clustering_model has detected"
                "a coverage fraction of {0:4.2f}.  This means that your model is"

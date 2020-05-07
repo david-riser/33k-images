@@ -1,15 +1,21 @@
 import argparse
 import numpy as np
 import os
+import sys
 import pandas as pd
 import tqdm
 import pickle
 
 from functools import partial
-from keras.applications import resnet50, inception_v3, nasnet, xception
 from keras.preprocessing import image
 from multiprocessing import Pool
 from sklearn.cluster import KMeans
+
+# Setup this project
+PROJECT_DIR = os.path.abspath(os.path.join(os.getcwd(), '..'))
+sys.path.append(PROJECT_DIR)
+from project_core.models import model_factory
+from project_core.utils import create_directory
 
 def get_args():
     ap = argparse.ArgumentParser()
@@ -21,34 +27,6 @@ def get_args():
     ap.add_argument('--cores', required=True, type=int)
     ap.add_argument('--save_features', action='store_true')
     return ap.parse_args()
-
-def model_factory(model_name, pooling=None):
-
-    if model_name == "test":
-        print('Instantiating a test model.')
-        exit()
-    elif model_name == 'ResNet50':
-        print('Instantiating a ResNet50')
-        model = resnet50.ResNet50(weights='imagenet', include_top=False, pooling=pooling)
-        preprocess_input = resnet50.preprocess_input
-        return model, preprocess_input
-    elif model_name == 'InceptionV3':
-        print('Instantiating a InceptionV3')
-        model = inception_v3.InceptionV3(weights='imagenet', include_top=False, pooling=pooling)
-        preprocess_input = inception_v3.preprocess_input
-        return model, preprocess_input
-    elif model_name == 'NASNet':
-        print('Instantiating a NASNet')
-        model = nasnet.NASNetLarge(weights='imagenet', include_top=False, pooling=pooling)
-        preprocess_input = nasnet.preprocess_input
-        return model, preprocess_input
-    elif model_name == 'Xception':
-        print('Instantiating a Xception')
-        model = xception.Xception(weights='imagenet', include_top=False, pooling=pooling)
-        preprocess_input = nasnet.preprocess_input
-        return model, preprocess_input
-    else:
-        print('Unknown model {}.  Exiting!'.format(model_name))
 
 def load_image(image_path, target_size=(224,224)):
     x = image.load_img(image_path, target_size=target_size)
@@ -76,8 +54,7 @@ if __name__ == "__main__":
     print("We have {} classes.".format(n_classes))
 
     # Setup output
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
+    create_directory(args.output, recursive=True)
 
     # Build the model and import the correct pre-processing
     # function.  Each model uses a different function.

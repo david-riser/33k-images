@@ -123,11 +123,6 @@ if __name__ == "__main__":
         class_mode='categorical'
     )
 
-    # Save validation folds with class encoded value
-    encoding = train_flow.class_indices
-    images['encoded_label'] = images['label'].apply(lambda x: encoding[x])
-    images.to_csv('validation_images_{}.csv'.format(args.experiment), index=False)
-
     # Build model and freeze most of it.
     model = build_model(input_shape, output_shape)
     for layer in model.layers[:-2]:
@@ -180,3 +175,8 @@ if __name__ == "__main__":
     # Plot metrics
     plot_loss(history=history, name=args.experiment)
     plot_metrics(history=history, name=args.experiment)
+
+    # Save validation folds with class encoded value
+    encoding = train_flow.class_indices
+    images['encoded_label'] = images['label'].apply(lambda x: encoding[x])
+    images[split:].to_csv('validation_images_{}.csv'.format(args.experiment), index=False)

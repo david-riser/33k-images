@@ -24,6 +24,11 @@ def try_to_open(image_path):
     except:
         return False
 
+def extract_hash(path):
+    """ Remove the super long string that 
+    contains the image identifier. """
+    return path.split('-')[0].split('_')[-1]
+    
 if __name__ == "__main__":
 
     args = get_args()
@@ -36,16 +41,23 @@ if __name__ == "__main__":
         abs_folder = os.path.abspath(folder)
         label = abs_folder.split('/')[-1]
 
+        hashes = set()
         for image_path in image_paths:
-            extension = image_path.split('.')[-1]
-            full_name = label + '/' + image_path
-            if extension not in prohibited_extensions and full_name not in missing:
-                if try_to_open(abs_folder + '/' + image_path):
-                    labels.append(label)
-                    files.append(label + '/' + image_path)
-                else:
-                    print(f'{image_path} does not open.')
+            image_hash = extract_hash(image_path)
+            if image_hash not in hashes:
+                hashes.add(image_hash)
+                extension = image_path.split('.')[-1]
+                full_name = label + '/' + image_path
+                if extension not in prohibited_extensions and full_name not in missing:
+                    if try_to_open(abs_folder + '/' + image_path):
+                        labels.append(label)
+                        files.append(label + '/' + image_path)
+                    else:
+                        print(f'{image_path} does not open.')
 
+            else:
+                print(f'{image_path} is a duplicate, skipping.')
+                
     data = pd.DataFrame({'label':labels, 'file':files})
     data.to_csv(args.output, index=False)
 

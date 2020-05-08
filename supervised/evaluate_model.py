@@ -9,7 +9,7 @@ import sys
 PROJECT_DIR = os.path.abspath(os.path.join(os.getcwd(), '..'))
 sys.path.append(PROJECT_DIR)
 
-from project_core.utils import predict_images
+from project_core.utils import predict_images, list_greyscale_images
 from sklearn.metrics import (adjusted_rand_score, confusion_matrix,
                              classification_report)
 from tensorflow.keras.applications import resnet50
@@ -74,7 +74,6 @@ def plot_pr(labels, preds, name):
     plt.savefig(name, bbox_inches='tight', dpi=100)
     plt.close()
 
-    
 def main(args):
     """ 
     Load images and model from main.py.  Use those
@@ -115,6 +114,13 @@ def main(args):
                           'figures/{}_confusion_matrix.png'.format(args.experiment))
     plot_pr(images['encoded_label'].values, preds,
             'figures/{}_pr_scatter.png'.format(args.experiment))
+
+    # Add some information to validation images
+    # file and save it again.  It's safe to overwrite
+    # the input.
+    images['greyscale'] = list_greyscale_images(images['path'].values)
+    images[['file', 'label', 'encoded_label', 'greyscale']].to_csv(args.images, index=False)
+    print('[INFO] Greyscale information {}'.format(np.unique(images['greyscale'], return_counts=True)))
     
 if __name__ == '__main__':
     main(get_args())

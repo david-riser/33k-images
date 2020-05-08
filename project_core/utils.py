@@ -74,3 +74,43 @@ def clustering_target_distribution(q):
     weight = q ** 2 / q.sum(0)
     return (weight.T / weight.sum(1)).T
 
+def list_greyscale_images(image_paths, target_size=(224,224)):
+    """ 
+    Load images specified by their paths and see if they
+    are greyscale.
+    """
+
+    output = []
+    for i, image_path in enumerate(image_paths):
+        try:
+            img = load_image(image_path, target_size)
+            if img.std(axis=2).mean() == 0:
+                output.append(1)
+            else:
+                output.append(0)
+            
+        except Exception as e:
+            print('Trouble loading: {}'.format(image_path))
+            output.append(2)
+            
+    return output
+
+def print_directory_stats(project_dir):
+    """ 
+    Print a summary of the number of files and 
+    folders currently in the project. 
+
+    :param project_dir: A string that specifies the
+    path to the data folders.
+
+    :returns: None
+    """
+
+    counter = {}
+    for folder, _, files in os.walk(project_dir):
+        if folder != project_dir:
+            counter[folder] = len(files)
+
+    print('[INFO] There are {} images in {} folders.'.format(
+        sum(list(counter.values())), len(list(counter.keys()))
+    ))

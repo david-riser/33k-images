@@ -25,7 +25,7 @@ def plot_loss(data, name):
 
     plt.hist(
         data[data['label_y'] == 0]['loss'],
-        bins=np.linspace(0,16,20),
+        bins=np.linspace(0,18,20),
         edgecolor='k',
         color='red',
         label='Images',
@@ -35,13 +35,14 @@ def plot_loss(data, name):
 
     plt.hist(
         data[data['label_y'] == 1]['loss'],
-        bins=np.linspace(0,16,20),
+        bins=np.linspace(0,18,20),
         edgecolor='k',
         color='blue',
         label='Diagrams',
         normed=True,
         alpha=0.65
     )
+
     plt.xlabel('Loss (Categorical Cross Entropy)')
     plt.grid(alpha=0.2)
     plt.legend(frameon=False)

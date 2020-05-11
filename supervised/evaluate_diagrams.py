@@ -77,7 +77,7 @@ def main(args):
     if not os.path.exists('figures/'):
         os.mkdir('figures')
     
-    plot_loss(merged, '{}_diagram_loss.png'.format(
+    plot_loss(merged, 'figures/{}_diagram_loss.png'.format(
         args.experiment
     ))
         

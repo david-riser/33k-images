@@ -37,7 +37,7 @@ def plot_loss(data, name):
         data[data['label_y'] == 1]['loss'],
         bins=np.linspace(0,16,20),
         edgecolor='k',
-        color='red',
+        color='blue',
         label='Diagrams',
         normed=True,
         alpha=0.65

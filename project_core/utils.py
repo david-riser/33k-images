@@ -1,7 +1,11 @@
 import numpy as np
 import os
 
+import tensorflow as tf
+from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.preprocessing import image
+from tensorflow.keras.utils import to_categorical
+
 
 def load_image(image_path, target_size=(224,224), preprocess_input=None):
     """ Load and preprocess an image."""
@@ -30,6 +34,19 @@ def predict_images(model, image_paths, target_size=(224,224),
             print('Trouble loading: {}'.format(image_path))
 
     return model.predict(images)
+
+def get_image_loss(preds, labels, target_size=(224,224),
+                   preprocess_input=None):
+    """ 
+    Load images specified by their paths and predict
+    whatever the model predicts.  Return that.
+
+    """
+
+    assert(len(preds) == len(labels))
+    clabels = to_categorical(labels)
+    cost = CategoricalCrossentropy(reduction='none')
+    return cost(preds, clabels).numpy()
 
 def infer_model_shapes(model):
     """
@@ -78,13 +95,17 @@ def list_greyscale_images(image_paths, target_size=(224,224)):
     """ 
     Load images specified by their paths and see if they
     are greyscale.
+
+    The channel axis is axis because we have a four 
+    dimensional matrix at this point. 
+    (batch_size, height, width, channels)
     """
 
     output = []
     for i, image_path in enumerate(image_paths):
         try:
             img = load_image(image_path, target_size)
-            if img.std(axis=2).mean() == 0:
+            if img.std(axis=3).mean() == 0:
                 output.append(1)
             else:
                 output.append(0)

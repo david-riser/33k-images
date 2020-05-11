@@ -9,7 +9,8 @@ import sys
 PROJECT_DIR = os.path.abspath(os.path.join(os.getcwd(), '..'))
 sys.path.append(PROJECT_DIR)
 
-from project_core.utils import predict_images, list_greyscale_images
+from project_core.utils import (get_image_loss, list_greyscale_images,
+                                predict_images)
 from sklearn.metrics import (adjusted_rand_score, confusion_matrix,
                              classification_report)
 from tensorflow.keras.applications import resnet50
@@ -74,6 +75,30 @@ def plot_pr(labels, preds, name):
     plt.savefig(name, bbox_inches='tight', dpi=100)
     plt.close()
 
+def plot_greyscale_loss(images, name):
+
+    plt.figure(figsize=(8,6))
+    plt.hist(
+        images[images['greyscale'] == 0]['loss'],
+        bins=np.linspace(0,17,60),
+        edgecolor='k',
+        color='red',
+        alpha=0.65,
+        label='Color'
+    )
+    plt.hist(
+        images[images['greyscale'] == 1]['loss'],
+        bins=np.linspace(0,17,60),
+        edgecolor='k',
+        color='blue',
+        alpha=0.65,
+        label='Greyscale'
+    )
+    plt.grid(alpha=0.2)
+    plt.xlabel('Loss (Categorical Cross Entropy)')
+    plt.legend(frameon=False)
+    plt.savefig(name, bbox_inches='tight', dpi=100)
+    
 def main(args):
     """ 
     Load images and model from main.py.  Use those
@@ -98,6 +123,15 @@ def main(args):
                                        target_size=(224,224),
                                        preprocess_input=resnet50.preprocess_input)
     preds = np.argmax(categorical_preds, axis=1)
+
+    print("[INFO] Getting image loss, this can take some time... ")
+    losses = get_image_loss(categorical_preds, images['encoded_label'])
+
+    if len(losses) == len(images):
+        images['loss'] = losses
+    else:
+        print("[FATAL] The image loss calculation missed something, exiting.")
+        exit()
     
     # Calculate some metrics
     ar_score = adjusted_rand_score(images['encoded_label'].values, preds)
@@ -115,11 +149,16 @@ def main(args):
     plot_pr(images['encoded_label'].values, preds,
             'figures/{}_pr_scatter.png'.format(args.experiment))
 
+    plot_greyscale_loss(
+        images,
+        'figures/{}_greyscale_loss.png'.format(args.experiment)
+    )
+    
     # Add some information to validation images
     # file and save it again.  It's safe to overwrite
     # the input.
     images['greyscale'] = list_greyscale_images(images['path'].values)
-    images[['file', 'label', 'encoded_label', 'greyscale']].to_csv(args.images, index=False)
+    images[['file', 'label', 'encoded_label', 'greyscale', 'loss']].to_csv(args.images, index=False)
     print('[INFO] Greyscale information {}'.format(np.unique(images['greyscale'], return_counts=True)))
     
 if __name__ == '__main__':

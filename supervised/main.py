@@ -20,6 +20,7 @@ def get_args():
     ap.add_argument('--batch_size', type=int, default=32)
     ap.add_argument('--batches_per_epoch', type=int, default=50)
     ap.add_argument('--max_epochs', type=int, default=5)
+    ap.add_argument('--train_fraction', type=float, default=0.9)
     ap.add_argument('--images', type=str, required=True)
     ap.add_argument('--base_dir', type=str, required=True)
     ap.add_argument('--experiment', type=str, required=True)
@@ -89,7 +90,7 @@ if __name__ == "__main__":
         input_shape, output_shape))
     
     # Build generators
-    split = int(0.9 * len(images))
+    split = int(args.train_fraction * len(images))
 
     augmentations = dict(
         rotation_range=20,
@@ -143,7 +144,7 @@ if __name__ == "__main__":
     metrics = ['accuracy', top3_metric, precision_metric, recall_metric]
 
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=metrics)
-    history = model.fit_generator(train_flow, steps_per_epoch=50, epochs=args.max_epochs,
+    history = model.fit_generator(train_flow, steps_per_epoch=params['batches_per_epoch'], epochs=args.max_epochs,
                                   validation_data=valid_flow, workers=4, callbacks=callbacks)
 
 
@@ -162,8 +163,9 @@ if __name__ == "__main__":
     model_checkpoint = ModelCheckpoint(filepath='weights_stage2_{}.hdf5'.format(args.experiment),
                                        monitor='val_loss')
     callbacks = [model_checkpoint, early_stopping, reduce_lr]
-    history_stage2 = model.fit_generator(train_flow, steps_per_epoch=50, epochs=args.max_epochs,
-                                         validation_data=valid_flow, workers=4, callbacks=callbacks)
+    history_stage2 = model.fit_generator(train_flow, steps_per_epoch=params['batches_per_epoch'],
+                                         epochs=args.max_epochs, validation_data=valid_flow,
+                                         workers=4, callbacks=callbacks)
 
     # Combine history
     for key in history.history.keys():

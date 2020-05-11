@@ -134,7 +134,10 @@ def main(args):
     else:
         print("[FATAL] The image loss calculation missed something, exiting.")
         exit()
-    
+
+    # Get the list of greyscale images for later calculations.
+    images['greyscale'] = list_greyscale_images(images['path'].values)
+
     # Calculate some metrics
     ar_score = adjusted_rand_score(images['encoded_label'].values, preds)
     print('Adjusted Rand Score: {0:6.4f}'.format(ar_score))
@@ -159,7 +162,6 @@ def main(args):
     # Add some information to validation images
     # file and save it again.  It's safe to overwrite
     # the input.
-    images['greyscale'] = list_greyscale_images(images['path'].values)
     images[['file', 'label', 'encoded_label', 'greyscale', 'loss']].to_csv(args.images, index=False)
     print('[INFO] Greyscale information {}'.format(np.unique(images['greyscale'], return_counts=True)))
     

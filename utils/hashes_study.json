@@ -1,0 +1,119 @@
+{
+    "sample_size": [
+        {
+            "sample_size": 10,
+            "diff_search_time": 0.0009548664093017578,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.001478433609008789,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 100,
+            "diff_search_time": 0.09602880477905273,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.013273954391479492,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 1000,
+            "diff_search_time": 9.666924953460693,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14562034606933594,
+            "hash_search_validity": 1.0
+        }
+    ],
+    "overlap_size": [
+        {
+            "overlap": 0.01,
+            "diff_search_time": 10.005731344223022,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.1428074836730957,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.05,
+            "diff_search_time": 10.01194977760315,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14287710189819336,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.1,
+            "diff_search_time": 9.71753191947937,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14180541038513184,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.2,
+            "diff_search_time": 9.876692295074463,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14376163482666016,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.4,
+            "diff_search_time": 9.78351092338562,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14437603950500488,
+            "hash_search_validity": 1.0
+        }
+    ],
+    "image_size": [
+        {
+            "image_size": [
+                8,
+                8,
+                3
+            ],
+            "diff_search_time": 5.89049220085144,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.11928367614746094,
+            "hash_search_validity": 1.0
+        },
+        {
+            "image_size": [
+                16,
+                16,
+                3
+            ],
+            "diff_search_time": 6.484331369400024,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.12335538864135742,
+            "hash_search_validity": 1.0
+        },
+        {
+            "image_size": [
+                32,
+                32,
+                3
+            ],
+            "diff_search_time": 9.07588815689087,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.1392674446105957,
+            "hash_search_validity": 1.0
+        },
+        {
+            "image_size": [
+                64,
+                64,
+                3
+            ],
+            "diff_search_time": 17.245354413986206,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.18056416511535645,
+            "hash_search_validity": 1.0
+        },
+        {
+            "image_size": [
+                128,
+                128,
+                3
+            ],
+            "diff_search_time": 45.25970983505249,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.307858943939209,
+            "hash_search_validity": 1.0
+        }
+    ]
+}

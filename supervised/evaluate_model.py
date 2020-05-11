@@ -85,7 +85,7 @@ def plot_greyscale_loss(images, name):
         color='red',
         alpha=0.65,
         label='Color',
-        density=True
+        normed=True
     )
     plt.hist(
         images[images['greyscale'] == 1]['loss'],
@@ -94,7 +94,7 @@ def plot_greyscale_loss(images, name):
         color='blue',
         alpha=0.65,
         label='Greyscale',
-        density=True
+        normed=True
     )
     plt.grid(alpha=0.2)
     plt.xlabel('Loss (Categorical Cross Entropy)')

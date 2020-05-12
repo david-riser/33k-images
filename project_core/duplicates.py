@@ -32,7 +32,7 @@ def get_numpy_loader(image):
             return img
     elif isinstance(image, str):
         def loader(img):
-            return np.asarray(Image.open(img))
+            return np.asarray(Image.open(img), dtype=np.uint8)
     elif isinstance(image, PIL.Image.Image):
         def loader(img):
             return np.asarray(img)

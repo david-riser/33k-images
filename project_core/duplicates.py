@@ -1,39 +1,45 @@
 import numpy as np
+import PIL
 
 from imagehash import dhash
 from PIL import Image
 
+
 def get_image_loader(image):
     """ """
-    
+
     if isinstance(image, np.ndarray):
         def loader(img):
             return Image.fromarray(img)
     elif isinstance(image, str):
         def loader(img):
             return Image.open(img)
-    elif isinstance(image, Image):
+    elif isinstance(image, PIL.Image.Image):
         def loader(img):
             return img
     else:
-        raise ValueError('List must be PIL.Image, numpy.ndarray, or str (path).')
+        raise ValueError('List must be PIL.Image, numpy.ndarray, or str (path) got {}.'.format(
+            type(image)
+        ))
         
     return loader
 
 def get_numpy_loader(image):
     """ """
-    
+
     if isinstance(image, np.ndarray):
         def loader(img):
             return img
     elif isinstance(image, str):
         def loader(img):
             return np.asarray(Image.open(img))
-    elif isinstance(image, Image):
+    elif isinstance(image, PIL.Image.Image):
         def loader(img):
             return np.asarray(img)
     else:
-        raise ValueError('List must be PIL.Image, numpy.ndarray, or str (path).')
+        raise ValueError('List must be PIL.Image, numpy.ndarray, or str (path) got {}.'.format(
+            type(image)
+        ))
         
     return loader
 
@@ -98,11 +104,13 @@ def hash_search(images):
     collisions = 0 
     true_matches = []
     for hash_, matches in matches.items():
-        diff_search_matches = diff_search(matches)
+        diff_search_matches = diff_search(
+            [images[m] for m in matches]
+        )
 
         returned_images = 0
         for match in diff_search_matches:
-            true_matches.append(match)
+            true_matches.append([matches[m] for m in match])
             returned_images += len(match)
             
         collisions += len(matches) - returned_images
@@ -119,7 +127,7 @@ def diff_search(images):
     and look for duplicates.
 
     """
-    
+
     loader = get_numpy_loader(images[0])
 
     cache = {}
@@ -140,4 +148,4 @@ def diff_search(images):
                     else:
                         matches[i] = [i,j]
 
-    return list(matches.keys())
+    return list(matches.values())

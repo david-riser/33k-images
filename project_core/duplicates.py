@@ -142,10 +142,11 @@ def diff_search(images):
             if j not in cache:
                 cache[j] = loader(images[j])
                 
-                if np.sum((cache[i] - cache[j])**2) == 0:
-                    if i in matches:
-                        matches[i].append(j)
-                    else:
-                        matches[i] = [i,j]
+                if (cache[i].shape == cache[j].shape):
+                    if np.sum((cache[i] - cache[j])**2) == 0:
+                        if i in matches:
+                            matches[i].append(j)
+                        else:
+                            matches[i] = [i,j]
 
     return list(matches.values())

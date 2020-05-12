@@ -86,28 +86,29 @@ if __name__ == "__main__":
 
     image_shape = (36, 36, 3)
 
-    # Generate a testing set.
-    images, matches = create_image_dataset(
-        imagesize=image_shape,
-        samples=100,
-        overlaps=10
-    )
-
+    # Place to keep our work!
     studies = {}
     studies['sample_size'] = []
     studies['overlap_size'] = []
     studies['image_size'] = []
 
     # Study the performance w.r.t. sample size
-    sample_sizes = [10, 100, 1000]
+    # sample_sizes = [10, 50, 100, 200, 400, 600, 800, 1000]
+    sample_sizes = range(10, 1000, 20)
+    print(sample_sizes)
     for sample_size in sample_sizes:
+        overlaps = int(sample_size // 10)
+        print('[DEBUG] Sample size {}, Overlap {}'.format(
+            sample_size, overlaps
+        ))
+
         data = {}
         data['sample_size'] = sample_size
         
         images, matches = create_image_dataset(
             imagesize=image_shape,
             samples=sample_size,
-            overlaps=int(0.1 * sample_size)
+            overlaps=overlaps
         )
         
         # Test difference method.
@@ -125,7 +126,8 @@ if __name__ == "__main__":
         print(data)
         studies['sample_size'].append(data)
         
-    overlap_sizes = [0.01, 0.05, 0.1, 0.2, 0.4]
+    # overlap_sizes = [0.01, 0.05, 0.1, 0.2, 0.4]
+    overlap_sizes = np.linspace(0.01, 0.4, 20)
     for overlap in overlap_sizes:
         data = {}
         data['overlap'] = overlap

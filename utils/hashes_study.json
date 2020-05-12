@@ -2,60 +2,494 @@
     "sample_size": [
         {
             "sample_size": 10,
-            "diff_search_time": 0.0009548664093017578,
+            "diff_search_time": 0.0009765625,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.001478433609008789,
+            "hash_search_time": 0.00147247314453125,
             "hash_search_validity": 1.0
         },
         {
-            "sample_size": 100,
-            "diff_search_time": 0.09602880477905273,
+            "sample_size": 30,
+            "diff_search_time": 0.008357048034667969,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.013273954391479492,
+            "hash_search_time": 0.003922700881958008,
             "hash_search_validity": 1.0
         },
         {
-            "sample_size": 1000,
-            "diff_search_time": 9.666924953460693,
+            "sample_size": 50,
+            "diff_search_time": 0.023524999618530273,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.14562034606933594,
+            "hash_search_time": 0.0066187381744384766,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 70,
+            "diff_search_time": 0.045653343200683594,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.009070158004760742,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 90,
+            "diff_search_time": 0.07575273513793945,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.01155710220336914,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 110,
+            "diff_search_time": 0.11791419982910156,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.01401066780090332,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 130,
+            "diff_search_time": 0.16114568710327148,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.01685810089111328,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 150,
+            "diff_search_time": 0.2156078815460205,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.01909351348876953,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 170,
+            "diff_search_time": 0.2721590995788574,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.021960973739624023,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 190,
+            "diff_search_time": 0.34844493865966797,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.024387598037719727,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 210,
+            "diff_search_time": 0.40888261795043945,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.026984453201293945,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 230,
+            "diff_search_time": 0.4996168613433838,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.029659748077392578,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 250,
+            "diff_search_time": 0.5794422626495361,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.03218245506286621,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 270,
+            "diff_search_time": 0.6905291080474854,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.03526163101196289,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 290,
+            "diff_search_time": 0.7882299423217773,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.03767228126525879,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 310,
+            "diff_search_time": 0.9032135009765625,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.04028034210205078,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 330,
+            "diff_search_time": 1.0090434551239014,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.04497933387756348,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 350,
+            "diff_search_time": 1.1489107608795166,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.046117305755615234,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 370,
+            "diff_search_time": 1.2880206108093262,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.04848742485046387,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 390,
+            "diff_search_time": 1.4307713508605957,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.05108785629272461,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 410,
+            "diff_search_time": 1.5576505661010742,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.053818702697753906,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 430,
+            "diff_search_time": 1.7356674671173096,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.05678224563598633,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 450,
+            "diff_search_time": 1.901163101196289,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.059314727783203125,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 470,
+            "diff_search_time": 2.0667426586151123,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.06224679946899414,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 490,
+            "diff_search_time": 2.2411434650421143,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.06456637382507324,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 510,
+            "diff_search_time": 2.4298369884490967,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.06753015518188477,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 530,
+            "diff_search_time": 2.6157658100128174,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.07054018974304199,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 550,
+            "diff_search_time": 2.841630220413208,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.07347416877746582,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 570,
+            "diff_search_time": 3.0975449085235596,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.07591629028320312,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 590,
+            "diff_search_time": 3.2700791358947754,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.07913422584533691,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 610,
+            "diff_search_time": 3.5318424701690674,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.08175468444824219,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 630,
+            "diff_search_time": 3.741971731185913,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.08460068702697754,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 650,
+            "diff_search_time": 4.006981372833252,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.0873270034790039,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 670,
+            "diff_search_time": 4.208486557006836,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.09020185470581055,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 690,
+            "diff_search_time": 4.505875587463379,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.0932919979095459,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 710,
+            "diff_search_time": 4.744838714599609,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.09697246551513672,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 730,
+            "diff_search_time": 4.975856065750122,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.09855985641479492,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 750,
+            "diff_search_time": 5.2622668743133545,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.10233116149902344,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 770,
+            "diff_search_time": 5.5934975147247314,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.10419964790344238,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 790,
+            "diff_search_time": 5.873942613601685,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.10734415054321289,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 810,
+            "diff_search_time": 6.159584283828735,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.11005854606628418,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 830,
+            "diff_search_time": 6.48780632019043,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.11316514015197754,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 850,
+            "diff_search_time": 6.856705188751221,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.11623716354370117,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 870,
+            "diff_search_time": 7.170730352401733,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.11946868896484375,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 890,
+            "diff_search_time": 7.5701940059661865,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.12303471565246582,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 910,
+            "diff_search_time": 7.806283712387085,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.12544512748718262,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 930,
+            "diff_search_time": 8.084043264389038,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.13197803497314453,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 950,
+            "diff_search_time": 8.512653827667236,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.13023066520690918,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 970,
+            "diff_search_time": 8.90815806388855,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.1389169692993164,
+            "hash_search_validity": 1.0
+        },
+        {
+            "sample_size": 990,
+            "diff_search_time": 9.26326060295105,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.1379988193511963,
             "hash_search_validity": 1.0
         }
     ],
     "overlap_size": [
         {
             "overlap": 0.01,
-            "diff_search_time": 10.005731344223022,
+            "diff_search_time": 9.251534223556519,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.1428074836730957,
+            "hash_search_time": 0.137465238571167,
             "hash_search_validity": 1.0
         },
         {
-            "overlap": 0.05,
-            "diff_search_time": 10.01194977760315,
+            "overlap": 0.030526315789473686,
+            "diff_search_time": 9.485528945922852,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.14287710189819336,
+            "hash_search_time": 0.13997745513916016,
             "hash_search_validity": 1.0
         },
         {
-            "overlap": 0.1,
-            "diff_search_time": 9.71753191947937,
+            "overlap": 0.05105263157894737,
+            "diff_search_time": 9.38504672050476,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.14180541038513184,
+            "hash_search_time": 0.13926219940185547,
             "hash_search_validity": 1.0
         },
         {
-            "overlap": 0.2,
-            "diff_search_time": 9.876692295074463,
+            "overlap": 0.07157894736842105,
+            "diff_search_time": 9.604706525802612,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.14376163482666016,
+            "hash_search_time": 0.14137744903564453,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.09210526315789473,
+            "diff_search_time": 9.461791276931763,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.1383988857269287,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.11263157894736842,
+            "diff_search_time": 9.607932567596436,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.13919734954833984,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.13315789473684211,
+            "diff_search_time": 9.354148387908936,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.13981890678405762,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.1536842105263158,
+            "diff_search_time": 9.422169923782349,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.13844680786132812,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.17421052631578948,
+            "diff_search_time": 9.299473285675049,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.1398770809173584,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.19473684210526315,
+            "diff_search_time": 9.639421463012695,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.13945651054382324,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.21526315789473685,
+            "diff_search_time": 9.536828994750977,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.1413733959197998,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.23578947368421055,
+            "diff_search_time": 9.731215953826904,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14109539985656738,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.2563157894736842,
+            "diff_search_time": 9.551621675491333,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14003252983093262,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.2768421052631579,
+            "diff_search_time": 9.747612953186035,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14174532890319824,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.2973684210526316,
+            "diff_search_time": 9.606189489364624,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14095354080200195,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.3178947368421053,
+            "diff_search_time": 9.786439180374146,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.13959980010986328,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.33842105263157896,
+            "diff_search_time": 9.634301900863647,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14131450653076172,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.3589473684210526,
+            "diff_search_time": 9.480461835861206,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14024639129638672,
+            "hash_search_validity": 1.0
+        },
+        {
+            "overlap": 0.3794736842105263,
+            "diff_search_time": 9.588728189468384,
+            "diff_search_validity": 1.0,
+            "hash_search_time": 0.14811205863952637,
             "hash_search_validity": 1.0
         },
         {
             "overlap": 0.4,
-            "diff_search_time": 9.78351092338562,
+            "diff_search_time": 9.78806734085083,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.14437603950500488,
+            "hash_search_time": 0.14085698127746582,
             "hash_search_validity": 1.0
         }
     ],
@@ -66,9 +500,9 @@
                 8,
                 3
             ],
-            "diff_search_time": 5.89049220085144,
+            "diff_search_time": 5.544792652130127,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.11928367614746094,
+            "hash_search_time": 0.11549210548400879,
             "hash_search_validity": 1.0
         },
         {
@@ -77,9 +511,9 @@
                 16,
                 3
             ],
-            "diff_search_time": 6.484331369400024,
+            "diff_search_time": 6.301653623580933,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.12335538864135742,
+            "hash_search_time": 0.11964964866638184,
             "hash_search_validity": 1.0
         },
         {
@@ -88,9 +522,9 @@
                 32,
                 3
             ],
-            "diff_search_time": 9.07588815689087,
+            "diff_search_time": 8.499663352966309,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.1392674446105957,
+            "hash_search_time": 0.14016389846801758,
             "hash_search_validity": 1.0
         },
         {
@@ -99,9 +533,9 @@
                 64,
                 3
             ],
-            "diff_search_time": 17.245354413986206,
+            "diff_search_time": 16.99778914451599,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.18056416511535645,
+            "hash_search_time": 0.17650985717773438,
             "hash_search_validity": 1.0
         },
         {
@@ -110,9 +544,9 @@
                 128,
                 3
             ],
-            "diff_search_time": 45.25970983505249,
+            "diff_search_time": 45.077765464782715,
             "diff_search_validity": 1.0,
-            "hash_search_time": 0.307858943939209,
+            "hash_search_time": 0.3020164966583252,
             "hash_search_validity": 1.0
         }
     ]

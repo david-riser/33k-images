@@ -69,7 +69,7 @@ def create_directory(path, recursive=False):
     :return: True/False boolean value that indicates existence
     of or creation of target directory.
     """
-    make_dir = os.path.makedirs if recursive else os.path.mkdir
+    make_dir = os.makedirs if recursive else os.mkdir
     if not os.path.exists(path):
         try:
             make_dir(path)

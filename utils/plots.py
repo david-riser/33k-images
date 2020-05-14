@@ -2,9 +2,14 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import os
+import sys
+
+PROJECT_DIR = os.path.abspath(os.path.join(os.getcwd(), '../'))
+sys.path.append(PROJECT_DIR)
 
 from matplotlib.backends.backend_pdf import PdfPages
-from utils import load_image
+from project_core.utils import load_image
 
 def main(args):
     """
@@ -15,8 +20,7 @@ def main(args):
 
     """
 
-    print('[INFO] Starting test...')
-    print(f'[INFO] Loading data from {args.data} as specified in the file {args.list}.')
+    print(f'[INFO] Loading data from {args.data} as specified in the file {args.dataframe}.')
 
     try:
         dataframe = pd.read_csv(args.dataframe)
@@ -26,16 +30,17 @@ def main(args):
 
     images = load_images(images=dataframe[args.image_col], data=args.data)
     plot_images(
-        image=images,
+        images=images,
         labels=dataframe[args.label_col],
         preds=dataframe[args.pred_col],
-        nrows=4,
-        ncols=3,
-        name='{}.pdf'.format(args.experiment)
+        nrows=args.cols,
+        ncols=args.rows,
+        name=args.pdf,
+        dpi=args.dpi
     )
 
 def plot_images(images, preds, labels, name,
-                ncols=4, nrows=4):
+                ncols=4, nrows=4, dpi=40):
     """
 
     Print a pdf file of images grouped by
@@ -53,13 +58,18 @@ def plot_images(images, preds, labels, name,
 
     """
 
+    total_pages = len(images) // (ncols * nrows)
+
+    # Setup colors for true labels
+    colors = { i:random_color() for i in np.unique(labels) }
+    
     with PdfPages(name) as pdf:
 
         fig, axs = plt.subplots(
             figsize=(8, 11),
             nrows=nrows, ncols=ncols,
-            share_x=True, share_y=True,
-            dpi=50
+            sharex=True, sharey=True,
+            dpi=40
         )
         fig.subplots_adjust(wspace=0, hspace=0)
 
@@ -68,23 +78,30 @@ def plot_images(images, preds, labels, name,
             pad = 1 + i % (ncols * nrows)
             new_page = (pad == 1)
 
+
             # It is time to print out the
             # previous page of the pdf.
             if new_page and i > 0:
                 pdf.savefig(fig)
                 plt.close()
 
-            row = (pad - 1) // ncols
-            col = (pad - 1) % nrows
+                print('[INFO] Printing page {} of {}.'.format(
+                    i // (ncols * nrows), total_pages
+                ))
 
+            row = (pad - 1) // ncols
+            col = (pad - 1) % ncols
+    
             # Plot an image there and remove axis
             # ticks if they exist to unblock the
             # figures and make them nicely sit
             # next to each other.
-            axs[row,col].imshow(images[index])
+            x = color_pad(images[index], colors[labels[index]])
+            axs[row,col].imshow(x)
             axs[row,col].set_xticklabels([])
             axs[row,col].set_yticklabels([])
-
+            axs[row,col].set_title(preds[index])
+            
         # It is possible that the last
         # page has not been printed.
         if not new_page:
@@ -98,7 +115,10 @@ def get_args():
     parser.add_argument('--pred_col', default='pred', type=str)
     parser.add_argument('--image_col', default='file', type=str)
     parser.add_argument('--dataframe', required=True, type=str)
-    parser.add_argument('--experiment', required=True, type=str)
+    parser.add_argument('--pdf', required=True, type=str)
+    parser.add_argument('--dpi', default=40, type=int)
+    parser.add_argument('--cols', default=6, type=int)
+    parser.add_argument('--rows', default=5, type=int)
     return parser.parse_args()
 
 def load_images(images, data):
@@ -112,8 +132,36 @@ def load_images(images, data):
     :return: A list of numpy array images.
 
     """
-    return [load_image(os.path.join(data,image)) \
+    return [load_image(os.path.join(data,image)).reshape(224,224,3) \
             for image in images]
+
+def color_pad(image, color=(122,122,122), pixels=16):
+    """ 
+    Add a pixel width colored border to the image.
+
+    There must be a better way to write this function. 
+
+    """
+
+    h, w, c = image.shape
+    new_image = np.zeros(
+        (h + 2 * pixels, w + 2 * pixels, c),
+        dtype=np.uint8)
+
+    #for i in range(h + 2*pixels):
+    #    for j in range(w + 2*pixels):
+    #        if (i < pixels) or (j < pixels):
+    #            new_image[i,j,:] = color
+    #        elif (i > h + pixels) or (j > w + pixels):
+    #            new_image[i,j,:] = color
+
+    new_image[:,:,:] = color
+    new_image[pixels : h + pixels, pixels : w + pixels] = image
+                
+    return new_image
+
+def random_color():
+    return np.random.randint(0, 255, 3)
 
 if __name__ == "__main__":
     main(get_args())

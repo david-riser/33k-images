@@ -125,7 +125,8 @@ def main(args):
                                        target_size=(224,224),
                                        preprocess_input=resnet50.preprocess_input)
     preds = np.argmax(categorical_preds, axis=1)
-
+    images['pred'] = preds
+    
     print("[INFO] Getting image loss, this can take some time... ")
     losses = get_image_loss(categorical_preds, images['encoded_label'])
 
@@ -162,7 +163,8 @@ def main(args):
     # Add some information to validation images
     # file and save it again.  It's safe to overwrite
     # the input.
-    images[['file', 'label', 'encoded_label', 'greyscale', 'loss']].to_csv(args.images, index=False)
+    images[['file', 'label', 'encoded_label', 'greyscale', 'loss', 'pred']].to_csv(
+        args.images, index=False)
     print('[INFO] Greyscale information {}'.format(np.unique(images['greyscale'], return_counts=True)))
     
 if __name__ == '__main__':

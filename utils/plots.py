@@ -69,7 +69,7 @@ def plot_images(images, preds, labels, name,
             figsize=(8, 11),
             nrows=nrows, ncols=ncols,
             sharex=True, sharey=True,
-            dpi=40
+            dpi=dpi
         )
         fig.subplots_adjust(wspace=0, hspace=0)
 

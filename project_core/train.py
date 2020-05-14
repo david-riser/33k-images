@@ -1,6 +1,6 @@
 import numpy as np
-from models import PretrainedDeepClusteringModel
-from utils import clustering_target_distribution
+from .models import PretrainedDeepClusteringModel
+from .utils import clustering_target_distribution
 
 def train_clustering_model(model, X_train, max_iter,
                            update_interval, batch_size,

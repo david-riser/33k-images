@@ -66,18 +66,19 @@ class ClusteringLayer(Layer):
         self.n_clusters = n_clusters
         self.alpha = alpha
         self.initial_weights = weights
-        self.input_spec = InputSpec(ndim=2)
+        # self.input_spec = InputSpec(ndim=2)
 
     def build(self, input_shape):
         assert len(input_shape) == 2
         input_dim = input_shape[1]
-        self.input_spec = InputSpec(dtype=K.floatx(), shape=(None, input_dim))
-        self.clusters = self.add_weight(shape=(self.n_clusters, input_dim), initializer='glorot_uniform', name='clusters')
-        if self.initial_weights is not None:
-            self.set_weights(self.initial_weights)
-            del self.initial_weights
-        self.built = True
-
+        # self.input_spec = InputSpec(dtype=K.floatx(), shape=(None, input_dim))
+        self.clusters = self.add_weight(
+            name='clusters',
+            shape=(self.n_clusters, input_dim),
+            initializer='glorot_uniform',
+            trainable=True)
+        super(ClusteringLayer, self).build(input_shape)
+        
     def call(self, inputs, **kwargs):
         """ student t-distribution, as same as used in t-SNE algorithm.
                  q_ij = 1/(1+dist(x_i, µ_j)^2), then normalize it.
@@ -113,9 +114,11 @@ class PretrainedDeepClusteringModel(Model):
         # Create the clustering layer and build the model as
         # the pretrained network plus the clustering layer.
         self.clustering_layer = ClusteringLayer(
-            n_clusters=n_clusters, name='clustering')
+            n_clusters=n_clusters, name='clustering',
+            input_shape=self.backbone.output.shape)
         self.clustering_layer.trainable = True
-
+        self.clustering_layer.build(self.backbone.output.shape)
+        
     def call(self, inputs):
         x = self.backbone(inputs)
         output = self.clustering_layer(x)
@@ -135,7 +138,7 @@ class PretrainedDeepClusteringModel(Model):
         z = self.backbone.predict(x)
         kmeans = KMeans(n_clusters=self.n_clusters)
         kmeans.fit(z)
-        self.model_.get_layer(name='clustering').set_weights(
+        self.clustering_layer.set_weights(
             [kmeans.cluster_centers_]
         )
         self.is_initialized_ = True

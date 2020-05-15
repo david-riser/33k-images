@@ -40,8 +40,8 @@ def main(args):
     kld = train_clustering_model(
         model=model,
         X_train=images[:split],
-        max_iter=300,
-        update_interval=25,
+        max_iter=125,
+        update_interval=10,
         batch_size=32,
         verbose=True
     )

@@ -42,15 +42,17 @@ def train_clustering_model(model, X_train, max_iter,
 
         if ite % update_interval == 0:
             
-            kld_loss.append(loss)
+
             q = model.predict(X_train, verbose=0)
             p = clustering_target_distribution(q)
 
-            if verbose:
-                print("[INFO] Epoch: {0}, Loss: {1:8.4f}".format(ite, loss))
 
         # Sample a batch of size batch_size from the training examples
         idx = np.random.choice(X_train.shape[0], batch_size, replace=False)
         loss = model.train_on_batch(x=X_train[idx], y=p[idx])
+        kld_loss.append(loss)
 
+        if verbose:
+            print("[INFO] Epoch: {0}, Loss: {1:8.4f}".format(ite, loss))
+            
     return kld_loss

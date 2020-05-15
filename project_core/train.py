@@ -26,6 +26,7 @@ def train_clustering_model(model, X_train, max_iter,
 
     :returns kld_loss: A list of loss values throughout the training.
     """
+    
     coverage_fraction = float((batch_size * max_iter) / X_train.shape[0])
     if coverage_fraction < 1.0:
         print(("[WARNING] project_core.train.train_clustering_model has detected"
@@ -40,6 +41,7 @@ def train_clustering_model(model, X_train, max_iter,
     for ite in range(int(max_iter)):
 
         if ite % update_interval == 0:
+            
             kld_loss.append(loss)
             q = model.predict(X_train, verbose=0)
             p = clustering_target_distribution(q)

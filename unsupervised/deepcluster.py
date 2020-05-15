@@ -1,4 +1,5 @@
 import argparse
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import os
@@ -36,31 +37,33 @@ def main(args):
     model.initialize_clusters(images[:split])
 
     print('[INFO] Training...')
-    train_clustering_model(
+    kld = train_clustering_model(
         model=model,
         X_train=images[:split],
-        max_iter=1000,
-        update_interval=50,
+        max_iter=300,
+        update_interval=25,
         batch_size=32,
         verbose=True
     )
 
-
     print('[INFO] Predicting...')
     pred = model.predict(images[split:])
-
+    pred = np.argmax(pred, axis=1)
+    
     print('[INFO] Saving...')
     # Save the clustering model weights.
-    model.save('weights_{}.hdf5'.format(args.experiment))
+    model.save_weights('weights_{}.hdf5'.format(args.experiment))
     
     # Save the dataframe of validation predictions and labels
     pd.DataFrame({
         'file':files[split:],
         'label':labels[split:],
-        'pred':preds
+        'pred':pred
     }).to_csv('validation_{}.csv'.format(args.experiment),
               index=False)
 
+    plot_kld(kld, args.experiment)
+    
     print('[INFO] Finished!')
     
 def get_args():
@@ -74,12 +77,25 @@ def get_args():
 
 def load_images_and_labels(data_dir, images_list, preprocess):
     data = pd.read_csv(images_list)
+    data = data.sample(frac=1).reset_index(drop=True)
     images = [load_image(os.path.join(data_dir, img),
                          preprocess_input=preprocess).reshape(224, 224, 3)
               for img in data['file']]
     
     return images, data['label'], data['file']
+
+def plot_kld(kld, expname):
+
+    if not os.path.exists('figures'):
+        os.mkdir('figures')
     
+    plt.figure(figsize=(8,6))
+    plt.plot(np.arange(len(kld)), kld, marker='o', color='red')
+    plt.xlabel('Update Step')
+    plt.ylabel('KL Divergence')
+    plt.grid(alpha=0.2)
+    plt.savefig('figures/{}_kld.png'.format(expname), bbox_inches='tight', dpi=100)
+
 if __name__ == "__main__":
     main(get_args())
 

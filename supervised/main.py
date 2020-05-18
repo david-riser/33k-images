@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import os
+import sys
+
+PROJECT_DIR = os.path.abspath(os.path.join(os.getcwd(), '../'))
+sys.path.append(PROJECT_DIR)
 
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -13,17 +17,19 @@ from tensorflow.keras.callbacks import (ModelCheckpoint,
 from tensorflow.keras.metrics import TopKCategoricalAccuracy, Precision, Recall
 from tensorflow.keras.models import load_model
 
+# This project
 from network import build_model
+from project_core.utils import build_files_dataframe, prune_file_list
+
 
 def get_args():
     ap = argparse.ArgumentParser()
+    ap.add_argument('--base_dir', type=str, required=True)
+    ap.add_argument('--experiment', type=str, required=True)
+    ap.add_argument('--min_samples', type=int, default=80)
     ap.add_argument('--batch_size', type=int, default=32)
     ap.add_argument('--batches_per_epoch', type=int, default=50)
     ap.add_argument('--max_epochs', type=int, default=5)
-    ap.add_argument('--train_fraction', type=float, default=0.9)
-    ap.add_argument('--images', type=str, required=True)
-    ap.add_argument('--base_dir', type=str, required=True)
-    ap.add_argument('--experiment', type=str, required=True)
     return ap.parse_args()
 
 def plot_loss(history, name):
@@ -66,7 +72,29 @@ def list_metrics(history):
             metrics.append(key)
 
     return metrics
-        
+
+def load_data(base_dir, min_samples):
+    
+    train = build_files_dataframe(os.path.join(args.base_dir, 'train'))
+    print(train.head())
+    train = prune_file_list(train, label_col='label',
+                            min_samples=args.min_samples)
+    train = train.sample(frac=1).reset_index(drop=True)
+
+    # Filter out the classes that we do not wait
+    # in our dev set.
+    classes = np.unique(train['label'])
+
+    # Load dev set and return it
+    dev = build_files_dataframe(os.path.join(args.base_dir, 'dev'))
+    print(dev.head())
+    dev = dev.sample(frac=1).reset_index(drop=True)
+    return_cols = list(dev.columns)
+    dev['keep'] = dev['label'].apply(lambda x: x in classes)
+    dev = dev[dev['keep'] == True]
+    
+    return train, dev[return_cols]
+
 if __name__ == "__main__":
 
     args = get_args()
@@ -80,17 +108,13 @@ if __name__ == "__main__":
     # Load and shuffle image path.  Also
     # encode the labels as integers for
     # ease of metric calculation later.
-    images = pd.read_csv(args.images)
-    images = images.sample(frac=1).reset_index(drop=True)
+    train, dev = load_data(args.base_dir, args.min_samples)
     
     # Calculate shapes for training
     input_shape = (224,224,3)
-    output_shape = images['label'].nunique()
+    output_shape = train['label'].nunique()
     print('[DEBUG] Input shape: {}, Output shape: {}'.format(
         input_shape, output_shape))
-    
-    # Build generators
-    split = int(args.train_fraction * len(images))
 
     augmentations = dict(
         rotation_range=20,
@@ -104,8 +128,8 @@ if __name__ == "__main__":
     valid_gen = ImageDataGenerator(**augmentations)
 
     train_flow = train_gen.flow_from_dataframe(
-        dataframe=images[:split],
-        directory=args.base_dir,
+        dataframe=train,
+        directory=os.path.join(args.base_dir, 'train'),
         batch_size=params['batch_size'],
         target_size=input_shape[:2],
         shuffle=True,
@@ -114,8 +138,8 @@ if __name__ == "__main__":
         class_mode='categorical'
     )
     valid_flow = valid_gen.flow_from_dataframe(
-        dataframe=images[split:],
-        directory=args.base_dir,
+        dataframe=dev,
+        directory=os.path.join(args.base_dir, 'dev'),
         batch_size=params['batch_size'],
         target_size=input_shape[:2],
         shuffle=True,
@@ -180,5 +204,5 @@ if __name__ == "__main__":
 
     # Save validation folds with class encoded value
     encoding = train_flow.class_indices
-    images['encoded_label'] = images['label'].apply(lambda x: encoding[x])
-    images[split:].to_csv('validation_images_{}.csv'.format(args.experiment), index=False)
+    dev['encoded_label'] = dev['label'].apply(lambda x: encoding[x])
+    dev.to_csv('dev_ms{}_{}.csv'.format(args.min_samples, args.experiment), index=False)

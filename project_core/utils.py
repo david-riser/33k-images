@@ -163,7 +163,29 @@ def prune_file_list(data, label_col, min_samples):
         lambda x: len(x) > min_samples
     ).values
     return data.iloc[keep][return_cols]
-    
+
+
+def build_files_dataframe(base_dir):
+    """ 
+
+    Explore the base directory and construct a list
+    of files with labels.
+
+    """
+
+    files, labels = [], []
+
+    for folder, _, the_files in os.walk(base_dir):
+        if folder != base_dir:
+            label = folder.split('/')[-1]
+            for f in the_files:
+                labels.append(label)
+                files.append(os.path.join(label,f))
+
+    data = pd.DataFrame({'file':files, 'label':labels})
+    return data
+
+
 if __name__ == "__main__":
 
     test_data = pd.DataFrame({

@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import pandas as pd
 
 import tensorflow as tf
 from tensorflow.keras.losses import CategoricalCrossentropy
@@ -135,3 +136,45 @@ def print_directory_stats(project_dir):
     print('[INFO] There are {} images in {} folders.'.format(
         sum(list(counter.values())), len(list(counter.keys()))
     ))
+
+    
+def prune_file_list(data, label_col, min_samples):
+    """ 
+    
+    Given a list of files, prune the list to contain 
+    only the entries for which the label specified by
+    label_col contains at least min_samples.
+    
+    :param data: Dataframe containing at least one column 
+    called label_col
+    :param label_col: The column used to specify class
+    :param min_samples: The minimum number of samples a
+    class needs to have to be kept.
+
+    """
+
+    if label_col not in list(data.columns):
+        raise ValueError("[ERROR] {} not in dataframe columns!".format(
+            label_col
+        ))
+    return_cols = list(data.columns)
+    
+    keep = data.groupby(label_col).transform(
+        lambda x: len(x) > min_samples
+    ).values
+    return data.iloc[keep][return_cols]
+    
+if __name__ == "__main__":
+
+    test_data = pd.DataFrame({
+        'file':np.arange(10),
+        'label':[0, 0, 0, 1, 1, 2, 2, 2, 2, 3]
+    })
+
+    filtered = prune_file_list(
+        data=test_data, label_col='label',
+        min_samples=2
+    )
+
+    print(test_data)
+    print(filtered)

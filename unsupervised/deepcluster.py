@@ -11,59 +11,92 @@ sys.path.append(PROJECT_DIR)
 
 from project_core.models import model_factory, PretrainedDeepClusteringModel
 from project_core.utils import load_image, build_files_dataframe, prune_file_list
-from project_core.train import train_clustering_model, KMeansImageDataGeneratorWrapper
+from project_core.train import train_clustering_model_generator, KMeansImageDataGeneratorWrapper
+from sklearn.metrics import adjusted_rand_score
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 def main(args):
-
+ 
     print('[INFO] Starting deep clustering...')
-    print('[INFO] Loading images.')
     
     # Setup the pre-trained backbone for our model.  This is
     # done first to get the preprocessing function for the net.
-    backbone, preprocess = model_factory('ResNet50', pooling='avg')
+    backbone, preprocess = model_factory(args.backbone, pooling=args.pooling)
     model = PretrainedDeepClusteringModel(n_clusters=args.clusters, backbone=backbone)
     opt = Adam(0.0001)
     model.compile(optimizer=opt, loss='kld')
 
     # Load the images into memory.  Right now
     # I am not supporting loading from disk.
-    (train_images, dev_images),  (train_labels, dev_labels), (train_files, dev_files) = load_images_and_labels(
-        args.base_dir, args.min_samples, preprocess)
-    train_images = np.array(train_images)
-    dev_images = np.array(dev_images)
-
+    train, dev = load_dataframes(args.base_dir, args.min_samples)
+    
+    # Use an image data generator to save memory.
+    augs = dict(preprocessing_function=preprocess)
+    gen = ImageDataGenerator(**augs)
+    train_flow = gen.flow_from_dataframe(
+        dataframe=train,
+        directory=os.path.join(args.base_dir, 'train'),
+        batch_size=args.batch_size,
+        target_size=(224,224),
+        shuffle=True,
+        x_col='file',
+        class_mode=None
+    )
+    
     print('[INFO] Initializing clusters.')
-    print(model.clustering_layer.get_weights())
-    model.initialize_clusters(train_images)
+    model.initialize_clusters_generator(train_flow, epochs=1,
+                                        steps_per_epoch=int(np.ceil(len(train) / args.batch_size)))
 
     print('[INFO] Training...')
-    kld = train_clustering_model(
+    kld = train_clustering_model_generator(
         model=model,
-        X_train=train_images,
-        max_iter=125,
-        update_interval=10,
-        batch_size=32,
+        gen=train_flow,
+        max_iter=args.epochs,
+        update_interval=args.update_interval,
+        batch_size=args.batch_size,
         verbose=True
     )
 
-    print('[INFO] Predicting...')
-    pred = model.predict(dev_images)
-    pred = np.argmax(pred, axis=1)
+    # Setup a generator for dev
+    dev_flow = gen.flow_from_dataframe(
+        dataframe=dev,
+        directory=os.path.join(args.base_dir, 'dev'),
+        batch_size=args.batch_size,
+        target_size=(224,224),
+        shuffle=False,
+        x_col='file',
+        class_mode=None
+    )
     
+    print('[INFO] Predicting...')
+    pred = []
+    batches = int(np.ceil(len(dev) / args.batch_size))
+    for batch in range(batches):
+        pred.extend(
+            np.argmax(
+                model.predict(next(dev_flow)),
+                axis = 1)
+        )
+    
+        
     print('[INFO] Saving...')
     # Save the clustering model weights.
     model.save_weights('weights_{}.hdf5'.format(args.experiment))
     
     # Save the dataframe of validation predictions and labels
     pd.DataFrame({
-        'file':dev_files,
-        'label':dev_labels,
+        'file':dev['file'],
+        'label':dev['label'],
         'pred':pred
     }).to_csv('validation_ms{}_{}.csv'.format(args.min_samples, args.experiment),
               index=False)
 
+    # A quick performance estimate.
+    print("[INFO] Adjusted Rand Index {0:6.4f}".format(
+        adjusted_rand_score(dev['label'], pred)
+    ))
+    
     plot_kld(kld, args.experiment)
     
     print('[INFO] Finished!')
@@ -74,9 +107,14 @@ def get_args():
     ap.add_argument('--experiment', required=True, type=str)
     ap.add_argument('--clusters', required=True, type=int)
     ap.add_argument('--min_samples', type=int, required=True)
+    ap.add_argument('--batch_size', type=int, default=32)
+    ap.add_argument('--backbone', type=str, default='ResNet50')
+    ap.add_argument('--pooling', type=str, default='avg')
+    ap.add_argument('--epochs', type=int, default=100)
+    ap.add_argument('--update_interval', type=int, default=10)
     return ap.parse_args()
 
-def load_images_and_labels(data_dir, min_samples, preprocess):
+def load_dataframes(data_dir, min_samples):
 
     train = build_files_dataframe(os.path.join(data_dir, 'train'))
     train = prune_file_list(train, 'label', min_samples)
@@ -89,16 +127,9 @@ def load_images_and_labels(data_dir, min_samples, preprocess):
     
     train = train.sample(frac=1).reset_index(drop=True)
     dev = dev.sample(frac=1).reset_index(drop=True)
+    return train, dev
 
-    train_images = [load_image(os.path.join(data_dir, 'train', img),
-                         preprocess_input=preprocess).reshape(224, 224, 3)
-              for img in train['file']]
-    dev_images = [load_image(os.path.join(data_dir, 'dev', img),
-                         preprocess_input=preprocess).reshape(224, 224, 3)
-              for img in dev['file']]
     
-    return (train_images, dev_images), (train['label'], dev['label']), (train['file'], dev['file'])
-
 def plot_kld(kld, expname):
 
     if not os.path.exists('figures'):

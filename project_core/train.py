@@ -67,6 +67,47 @@ def train_clustering_model(model, X_train, max_iter,
     return kld_loss
 
 
+def train_clustering_model_generator(model, gen, max_iter,
+                                     update_interval, batch_size,
+                                     verbose=True):
+    """
+
+    :param model: PretrainedDeepClusteringModel to be trained
+    :param gen: An input ImageDataGenerator.
+    :param max_iter: The maximum number of supervised learning steps
+    in total.  This is the number of batches that will be processed.
+    :param update_interval: How often the target distribution is updated.
+    :param batch_size: The number of instances in each training batch.
+
+    :returns kld_loss: A list of loss values throughout the training.
+    """
+    
+
+    kld_loss = []
+    loss = np.inf
+    for ite in range(int(max_iter)):
+
+        if ite % update_interval == 0:
+            
+            batch = next(gen)
+            while len(batch) != batch_size:
+                batch = next(gen)
+                
+            q = model.predict(batch, verbose=0)
+            p = utils.clustering_target_distribution(q)
+
+
+        batch = next(gen)
+        if len(batch) == batch_size:
+            loss = model.train_on_batch(x=batch, y=p)
+            kld_loss.append(loss)
+
+        if verbose:
+            print("[INFO] Epoch: {0}, Loss: {1:8.4f}".format(ite, loss))
+            
+    return kld_loss
+
+
 class KMeansImageDataGeneratorWrapper:
 
     def __init__(self, keras_model, **kwargs):

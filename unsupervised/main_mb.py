@@ -32,23 +32,6 @@ def get_args():
     ap.add_argument('--save_features', action='store_true')
     return ap.parse_args()
 
-def load_image(image_path, target_size=(224,224)):
-    x = image.load_img(image_path, target_size=target_size)
-    x = np.expand_dims(x, axis=0)
-    x = preprocess_input(x)
-    return x
-
-def predict_image(model, image_path, preprocess_input):
-    x = load_image(image_path)
-    return model.predict(x)
-
-def predict_images(model, image_paths, preprocess_input, cores, image_loader):
-    pool = Pool(cores)
-    x = np.array(pool.map(image_loader, image_paths))
-    pool.close()
-    pool.join()    
-    x = x.reshape(x.shape[0], x.shape[2], x.shape[3], x.shape[4])
-    return model.predict(x)
 
 if __name__ == "__main__":
 
@@ -57,10 +40,8 @@ if __name__ == "__main__":
     # Load images and remove the classes with
     # too few examples.
     train = build_files_dataframe(os.path.join(args.base_dir, 'train'))
-    print(train.head())
     train = prune_file_list(data=train, label_col='label',
-                            min_samples=args.min_samples)
-    
+                            min_samples=args.min_samples)    
     n_classes = train['label'].nunique()
     print("We have {} classes.".format(n_classes))
 
@@ -81,29 +62,50 @@ if __name__ == "__main__":
     else:
         target_size = (224,224)
 
-    image_loader = partial(load_image, target_size=target_size)
+    # Image generation from disk to
+    # save teh memory overloadzzzz! 
+    augmentations = dict(
+        horizontal_flip=False,
+        preprocessing_function=preprocess_input
+    )
 
-    batch_size = 1024
+    batch_size = 128
+    generator = ImageDataGenerator(**augmentations)
+    flow = generator.flow_from_dataframe(
+        dataframe=train,
+        directory=os.path.join(args.base_dir, 'train'),
+        batch_size=batch_size,
+        target_size=target_size,
+        shuffle=True,
+        x_col='file',
+        class_mode=None
+    )
+    
     batches = int(np.ceil(len(train) / batch_size))
-    for i in tqdm.tqdm(range(batches)):
-        test_images = [os.path.join(args.base_dir, 'train') + '/' + img
-                       for img in train['file'].values[i*batch_size : (i+1)*batch_size]]
-        features[i*batch_size : (i+1)*batch_size,:] = predict_images(
-            model, test_images, preprocess_input, args.cores, image_loader
-        )
+    kmeans = KMeansImageDataGeneratorWrapper(keras_model=model, n_clusters=n_classes)
+    kmeans.fit_generator(flow, epochs=1, steps_per_epoch=batches)
 
-    # Cluster the results in feature space.  This takes quite a lot
-    # of memory (depending on the number of input images).
-    kmeans = KMeans(n_clusters=n_classes)
-    clusters = kmeans.fit_predict(features)
+
+    flow = generator.flow_from_dataframe(
+        dataframe=train,
+        directory=os.path.join(args.base_dir, 'train'),
+        batch_size=batch_size,
+        target_size=target_size,
+        shuffle=False,
+        x_col='file',
+    class_mode=None
+    )
+
+    clusters = kmeans.predict(flow, steps=batches)
     pd.DataFrame(
         {'label':train['label'], 'cluster':clusters, 'file':train['file']}
-    ).to_csv(args.output_dir + '/{}_{}_clusters.csv'.format(
-        args.backbone, args.pooling), index=False)
+    ).to_csv(args.output_dir + '/{}_{}_ms{}_clusters.csv'.format(
+        args.backbone, args.pooling, args.min_samples), index=False)
 
-    with open(args.output_dir + '/{}_{}_centroids.pkl'.format(args.backbone, args.pooling), 'wb') as out:
-        pickle.dump({'centroids':kmeans.cluster_centers_, 'labels':kmeans.labels_, 'inertia':kmeans.inertia_}, out)
+    # Not needed right now.
+    #with open(args.output_dir + '/{}_{}_centroids.pkl'.format(args.backbone, args.pooling), 'wb') as out:
+    #    pickle.dump({'centroids':kmeans.cluster_centers_, 'labels':kmeans.labels_, 'inertia':kmeans.inertia_}, out)
 
-    if args.save_features:
-        with open(args.output_dir + '/{}_{}_features.pkl'.format(args.backbone, args.pooling), 'wb') as out:
-            pickle.dump({'features':features}, out)
+    #if args.save_features:
+    #    with open(args.output_dir + '/{}_{}_features.pkl'.format(args.backbone, args.pooling), 'wb') as out:
+    #        pickle.dump({'features':features}, out)

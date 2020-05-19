@@ -67,7 +67,9 @@ if __name__ == "__main__":
 
         backbone = csvfile.split('/')[-1].split('_')[0]
         pooling = csvfile.split('/')[-1].split('_')[1]
-        name_lut[csvfile] = ':'.join([backbone, pooling])
+        min_samples = csvfile.split('/')[-1].split('_')[2]
+        
+        name_lut[csvfile] = ':'.join([backbone, pooling, min_samples])
         
         data[csvfile] = pd.read_csv(csvfile)
         encoder = LabelEncoder()

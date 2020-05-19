@@ -1,6 +1,11 @@
 import numpy as np
+import tqdm
+
 from .models import PretrainedDeepClusteringModel
 from .utils import clustering_target_distribution
+
+from sklearn.cluster import MiniBatchKMeans
+
 
 def train_clustering_model(model, X_train, max_iter,
                            update_interval, batch_size,
@@ -56,3 +61,34 @@ def train_clustering_model(model, X_train, max_iter,
             print("[INFO] Epoch: {0}, Loss: {1:8.4f}".format(ite, loss))
             
     return kld_loss
+
+
+class KMeansImageDataGeneratorWrapper:
+
+    def __init__(self, keras_model, **kwargs):
+        self.model = keras_model
+        self.kmeans = MiniBatchKMeans(**kwargs)
+        
+    def fit_generator(self, generator, epochs, steps_per_epoch):
+        
+        for epoch in range(epochs):
+            print(f"[INFO] Processing epoch {epoch} of {epochs}.")
+            for step in tqdm.tqdm(range(steps_per_epoch)):
+                self.kmeans.partial_fit(self.model.predict(
+                    next(generator)
+                ))
+                
+                
+    def predict(self, generator, steps):
+        clusters = []
+        for step in range(steps):
+            clusters.extend(self.kmeans.predict(
+                self.model.predict(
+                    next(generator)
+            )))
+
+        return clusters
+    
+    @property
+    def centroids(self):
+        return self.kmeans.cluster_centers_

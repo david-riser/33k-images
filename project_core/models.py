@@ -7,9 +7,12 @@ from tensorflow.keras.applications import (inception_v3,
                                            xception)
 from tensorflow.keras.layers import InputSpec, Layer
 
+#from .train import KMeansImageDataGeneratorWrapper
+
 
 MODELS = ['InceptionV3', 'NASNet',
             'ResNet50', 'Xception']
+
 
 def model_factory(model_name, pooling=None):
 

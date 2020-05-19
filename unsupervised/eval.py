@@ -106,6 +106,6 @@ if __name__ == "__main__":
     plt.grid(alpha=0.2)
     plt.title('Image Clusters w/ Transfer Learning (untuned)')
     plt.xlabel('Adjusted Rand Index')
-    plt.xlim([0.0, 0.4])
+    plt.xlim([0.0, 0.6])
     plt.savefig('figures/rand_barh.png', bbox_inches='tight', dpi=100)
     plt.close()

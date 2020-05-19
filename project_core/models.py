@@ -9,7 +9,7 @@ from tensorflow.keras import Model
 from tensorflow.keras.applications import (inception_v3,
                                            nasnet, resnet50,
                                            xception)
-from tensorflow.keras.layers import InputSpec, Layer
+from tensorflow.keras.layers import InputSpec, Layer, Dense
 
 # This project
 from . import train
@@ -159,4 +159,33 @@ class PretrainedDeepClusteringModel(Model):
         self.clustering_layer.set_weights(
             [kmeans.centroids]
         )
+        self.inertia_ = kmeans.inertia
         self.is_initialized_ = True
+
+    @property
+    def inertia(self):
+        if self.is_initialized_:
+            return self.inertia_
+        else:
+            return np.inf
+
+
+class LinearModel(Model):
+
+    def __init__(self, encoder, n_classes):
+        super(LinearModel, self).__init__()
+        self.encoder = encoder
+        self.linear = Dense(
+            units=n_classes,
+            activation='softmax'
+        )
+        self.linear.build(self.encoder.output.shape)
+        self.build(self.encoder.input.shape)
+        self.linear.trainable = True
+        
+        for layer in self.encoder.layers:
+            layer.trainable = False
+
+    def call(self, x):
+        output = self.linear(self.encoder(x))
+        return output

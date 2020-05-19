@@ -137,3 +137,7 @@ class KMeansImageDataGeneratorWrapper:
     @property
     def centroids(self):
         return self.kmeans.cluster_centers_
+
+    @property
+    def inertia(self):
+        return self.kmeans.inertia_

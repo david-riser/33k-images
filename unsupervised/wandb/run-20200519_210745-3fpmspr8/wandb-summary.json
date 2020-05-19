@@ -1,0 +1,1 @@
+{"_runtime": 298.4425439834595, "_step": 32, "inertia": 16921.134765625, "_timestamp": 1589922761.9257998, "linear_epochs": 20, "linear_n_classes": 12, "linear_steps_per_epoch": 32, "linear_batch_size": 32, "linear_metric": 0.5364091382621194, "linear_loss": 0.4751635775901377, "ari": 0.4249902651972521, "epoch": 9, "kl_divergence": 0.14014127850532532}

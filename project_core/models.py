@@ -1,3 +1,7 @@
+# Standard library imports
+import os
+
+# Third party imports
 import numpy as np
 from sklearn.cluster import KMeans
 from tensorflow.keras import backend as K
@@ -7,7 +11,8 @@ from tensorflow.keras.applications import (inception_v3,
                                            xception)
 from tensorflow.keras.layers import InputSpec, Layer
 
-#from .train import KMeansImageDataGeneratorWrapper
+# This project
+from . import train
 
 
 MODELS = ['InceptionV3', 'NASNet',
@@ -143,5 +148,15 @@ class PretrainedDeepClusteringModel(Model):
         kmeans.fit(z)
         self.clustering_layer.set_weights(
             [kmeans.cluster_centers_]
+        )
+        self.is_initialized_ = True
+
+    def initialize_clusters_generator(self, gen, epochs, steps_per_epoch):
+        kmeans = train.KMeansImageDataGeneratorWrapper(
+            keras_model=self.backbone, n_clusters=self.n_clusters
+        )
+        kmeans.fit_generator(gen, epochs=epochs, steps_per_epoch=steps_per_epoch)
+        self.clustering_layer.set_weights(
+            [kmeans.centroids]
         )
         self.is_initialized_ = True

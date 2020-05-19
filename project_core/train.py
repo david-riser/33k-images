@@ -1,11 +1,15 @@
+# Standard library imports 
+import os
+
+# Third-party imports
 import numpy as np
 import tqdm
 
-from .models import PretrainedDeepClusteringModel
-from .utils import clustering_target_distribution
-
 from sklearn.cluster import MiniBatchKMeans
 
+# This project
+from . import utils
+from . import models
 
 def train_clustering_model(model, X_train, max_iter,
                            update_interval, batch_size,
@@ -49,7 +53,7 @@ def train_clustering_model(model, X_train, max_iter,
             
 
             q = model.predict(X_train, verbose=0)
-            p = clustering_target_distribution(q)
+            p = utils.clustering_target_distribution(q)
 
 
         # Sample a batch of size batch_size from the training examples

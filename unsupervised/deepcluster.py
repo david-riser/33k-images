@@ -30,8 +30,7 @@ def main(args):
     # done first to get the preprocessing function for the net.
     backbone, preprocess = model_factory(args.backbone, pooling=args.pooling)
     model = PretrainedDeepClusteringModel(n_clusters=args.clusters, backbone=backbone)
-    opt = Adam(0.0001)
-    model.compile(optimizer=opt, loss='kld')
+    model.compile(optimizer=Adam(args.learning_rate), loss='kld')
 
     # Load the images into memory.  Right now
     # I am not supporting loading from disk.
@@ -60,7 +59,7 @@ def main(args):
         model=model,
         gen=train_flow,
         max_iter=args.epochs,
-        update_interval=args.update_interval,
+        target_updates=args.target_updates,
         batch_size=args.batch_size,
         verbose=True
     )
@@ -92,6 +91,8 @@ def main(args):
     for layer in encoder.layers:
         encoder.trainable = False
 
+    print(encoder.summary())
+        
     label_encoder = LabelEncoder()
     train['encoded_label'] = label_encoder.fit_transform(train['label'])
     dev['encoded_label'] = label_encoder.transform(dev['label'])
@@ -119,14 +120,14 @@ def main(args):
         
     print('[INFO] Saving...')
     # Save the clustering model weights.
-    model.save_weights('weights_{}.hdf5'.format(args.experiment))
+    model.save_weights('weights_{}.hdf5'.format(wandb.run.id))
     
     # Save the dataframe of validation predictions and labels
     pd.DataFrame({
         'file':dev['file'],
         'label':dev['label'],
         'pred':pred
-    }).to_csv('validation_ms{}_{}.csv'.format(args.min_samples, args.experiment),
+    }).to_csv('dev_ms{}_{}.csv'.format(args.min_samples, wandb.run.id),
               index=False)
 
     # A quick performance estimate.
@@ -139,24 +140,25 @@ def main(args):
     wandb.log({'ari':ar_score})
 
     for epoch, loss in enumerate(kld):
-        wandb.log({'epoch':epoch, 'kl_divergence':loss})
+        wandb.log({'kl_divergence':loss, 'epoch':epoch})
     
-    plot_kld(kld, args.experiment)
+    plot_kld(kld, wandb.run.name)
     
     print('[INFO] Finished!')
     
 def get_args():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--base_dir', required=True, type=str)
-    ap.add_argument('--experiment', required=True, type=str)
-    ap.add_argument('--clusters', required=True, type=int)
-    ap.add_argument('--min_samples', type=int, required=True)
+    ap.add_argument('--base_dir', type=str, default='/home/ubuntu/data')
+    ap.add_argument('--clusters', type=int, default=12)
+    ap.add_argument('--min_samples', type=int, default=320)
+    
     ap.add_argument('--batch_size', type=int, default=32)
     ap.add_argument('--backbone', type=str, default='ResNet50')
     ap.add_argument('--pooling', type=str, default='avg')
+    ap.add_argument('--learning_rate', type=float, default=0.0001)
     ap.add_argument('--epochs', type=int, default=100)
     ap.add_argument('--kmeans_epochs', type=int, default=1)
-    ap.add_argument('--update_interval', type=int, default=10)
+    ap.add_argument('--target_updates', type=int, default=10)
     return ap.parse_args()
 
 def load_dataframes(data_dir, min_samples):
@@ -194,9 +196,10 @@ def setup_wandb(args):
     config = dict(
         batch_size = args.batch_size,
         epochs = args.epochs,
-        update_interval = args.update_interval,
+        target_updates = args.target_updates,
         architecture = ":".join([args.backbone, args.pooling]),
-        kmeans_epochs = args.kmeans_epochs
+        kmeans_epochs = args.kmeans_epochs,
+        learning_rate = args.learning_rate
     )
 
     wandb.init(
@@ -210,7 +213,7 @@ def setup_wandb(args):
 def linear_eval(encoder, train_gen, dev_gen,
                 train_labels, dev_labels,
                 metric=None, log_training=False,
-                epochs=20, steps_per_epoch=32):
+                epochs=40, steps_per_epoch=32):
     """ 
 
     Create a linear model and evaluate the representation created by the

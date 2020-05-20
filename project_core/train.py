@@ -68,7 +68,7 @@ def train_clustering_model(model, X_train, max_iter,
 
 
 def train_clustering_model_generator(model, gen, max_iter,
-                                     update_interval, batch_size,
+                                     target_updates, batch_size,
                                      verbose=True):
     """
 
@@ -82,7 +82,12 @@ def train_clustering_model_generator(model, gen, max_iter,
     :returns kld_loss: A list of loss values throughout the training.
     """
     
-
+    update_interval = int(np.ceil(max_iter / target_updates))
+    if update_interval == 0:
+        update_interval = 1
+        
+    print("[INFO] Using update interval {}".format(update_interval))
+    
     kld_loss = []
     loss = np.inf
     for ite in range(int(max_iter)):

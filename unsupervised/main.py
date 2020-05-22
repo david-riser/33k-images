@@ -29,6 +29,7 @@ def get_args():
     ap.add_argument('--output_dir', required=True, type=str)
     ap.add_argument('--min_samples', required=True, type=int)
     ap.add_argument('--cores', required=True, type=int)
+    ap.add_argument('--batch_size', default=32, type=int)
     ap.add_argument('--save_features', action='store_true')
     return ap.parse_args()
 
@@ -50,20 +51,31 @@ def predict_images(model, image_paths, preprocess_input, cores, image_loader):
     x = x.reshape(x.shape[0], x.shape[2], x.shape[3], x.shape[4])
     return model.predict(x)
 
+def load_dataframes(data_dir, min_samples):
+
+    train = build_files_dataframe(os.path.join(data_dir, 'train'))
+    train = prune_file_list(train, 'label', min_samples)
+
+    dev = build_files_dataframe(os.path.join(data_dir, 'dev'))
+    dev_cols = list(dev.columns)
+    classes = np.unique(train['label'])
+    dev['keep'] = dev['label'].apply(lambda x: x in classes)
+    dev = dev[dev['keep'] == True]
+    
+    train = train.sample(frac=1).reset_index(drop=True)
+    dev = dev.sample(frac=1).reset_index(drop=True)
+    return train, dev
+
 if __name__ == "__main__":
 
     args = get_args()
 
     # Load images and remove the classes with
     # too few examples.
-    train = build_files_dataframe(os.path.join(args.base_dir, 'train'))
-    print(train.head())
-    train = prune_file_list(data=train, label_col='label',
-                            min_samples=args.min_samples)
-    
+    train, dev = load_dataframes(args.base_dir, args.min_samples)
     n_classes = train['label'].nunique()
     print("We have {} classes.".format(n_classes))
-
+    
     # Setup output
     create_directory(args.output_dir, recursive=True)
 
@@ -81,29 +93,52 @@ if __name__ == "__main__":
     else:
         target_size = (224,224)
 
-    image_loader = partial(load_image, target_size=target_size)
+    # Use an image data generator to save memory.
+    augs = dict(preprocessing_function=preprocess_input)
+    gen = ImageDataGenerator(**augs)
+    train_flow = gen.flow_from_dataframe(
+        dataframe=train,
+        directory=os.path.join(args.base_dir, 'train'),
+        batch_size=args.batch_size,
+        target_size=(224,224),
+        shuffle=True,
+        x_col='file',
+        class_mode=None
+    )
 
-    batch_size = 1024
-    batches = int(np.ceil(len(train) / batch_size))
-    for i in tqdm.tqdm(range(batches)):
-        test_images = [os.path.join(args.base_dir, 'train') + '/' + img
-                       for img in train['file'].values[i*batch_size : (i+1)*batch_size]]
-        features[i*batch_size : (i+1)*batch_size,:] = predict_images(
-            model, test_images, preprocess_input, args.cores, image_loader
-        )
+    kmeans = KMeansImageDataGeneratorWrapper(
+        keras_model=model, n_clusters=n_classes
+    )
+    kmeans.fit_generator(
+        generator=train_flow,
+        epochs=4,
+        steps_per_epoch=100
+    )
 
-    # Cluster the results in feature space.  This takes quite a lot
-    # of memory (depending on the number of input images).
-    kmeans = KMeans(n_clusters=n_classes)
-    clusters = kmeans.fit_predict(features)
+    # Output for dev set predictions
+    dev_flow = gen.flow_from_dataframe(
+        dataframe=dev,
+        directory=os.path.join(args.base_dir, 'dev'),
+        batch_size=args.batch_size,
+        target_size=(224,224),
+        shuffle=False,
+        x_col='file',
+        class_mode=None
+    )
+
+    print('[INFO] Predicting...')
+    batches = int(np.ceil(len(dev) / args.batch_size))
+    print("[INFO] Using {} batches for dev set.".format(batches))    
+    pred = kmeans.predict(dev_flow, steps=batches)
+        
     pd.DataFrame(
-        {'label':train['label'], 'cluster':clusters, 'file':train['file']}
+        {'label':dev['label'], 'cluster':pred, 'file':dev['file']}
     ).to_csv(args.output_dir + '/{}_{}_clusters.csv'.format(
         args.backbone, args.pooling), index=False)
 
-    with open(args.output_dir + '/{}_{}_centroids.pkl'.format(args.backbone, args.pooling), 'wb') as out:
-        pickle.dump({'centroids':kmeans.cluster_centers_, 'labels':kmeans.labels_, 'inertia':kmeans.inertia_}, out)
+    #with open(args.output_dir + '/{}_{}_centroids.pkl'.format(args.backbone, args.pooling), 'wb') as out:
+    #    pickle.dump({'centroids':kmeans.cluster_centers_, 'labels':kmeans.labels_, 'inertia':kmeans.inertia_}, out)
 
-    if args.save_features:
-        with open(args.output_dir + '/{}_{}_features.pkl'.format(args.backbone, args.pooling), 'wb') as out:
-            pickle.dump({'features':features}, out)
+    #if args.save_features:
+    #    with open(args.output_dir + '/{}_{}_features.pkl'.format(args.backbone, args.pooling), 'wb') as out:
+    #        pickle.dump({'features':features}, out)

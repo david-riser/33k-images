@@ -212,8 +212,7 @@ def linear_eval(encoder, train_gen, dev_gen,
     # training generator.
     model = LinearModel(encoder=encoder, n_classes=n_classes)
     model.compile(optimizer=Adam(0.001), loss='categorical_crossentropy')
-    history = model.fit_generator(train_gen, epochs=epochs, steps_per_epoch=steps_per_epoch,
-                                  workers=4, max_queue_size=512)
+    history = model.fit_generator(train_gen, epochs=epochs, steps_per_epoch=steps_per_epoch)
 
     # I don't know maybe there is a nice way to infer
     # this from the gen but this is my method.  I use

@@ -63,12 +63,15 @@ def main(args):
         n_clusters=args.clusters,
         init='k-means++'
     )
-
+    
     batches = int(np.ceil(len(train) / args.batch_size))
+    mu, sigma = standardize_over_batches(encoder, train_flow, batches)
     for epoch in range(args.kmeans_epochs):
         for batch in range(batches):
             x_batch = next(train_flow)
-            kmeans.partial_fit(encoder.predict(x_batch))
+            z_batch = encoder.predict(x_batch)
+            z_batch = (z_batch - mu) / sigma
+            kmeans.partial_fit(z_batch)
 
     wandb.log({'inertia':kmeans.inertia_})
 
@@ -88,9 +91,9 @@ def main(args):
     batches = int(np.ceil(len(dev) / args.batch_size))
     for batch in range(batches):
         x_batch = next(dev_flow)
-        pred.extend(kmeans.predict(
-            encoder.predict(x_batch)
-        ))
+        z_batch = encoder.predict(x_batch)
+        z_batch = (z_batch - mu) / sigma
+        pred.extend(kmeans.predict(z_batch))
 
     print('[INFO] Running linear evaluation...')
     for layer in encoder.layers:
@@ -209,7 +212,8 @@ def linear_eval(encoder, train_gen, dev_gen,
     # training generator.
     model = LinearModel(encoder=encoder, n_classes=n_classes)
     model.compile(optimizer=Adam(0.001), loss='categorical_crossentropy')
-    history = model.fit_generator(train_gen, epochs=epochs, steps_per_epoch=steps_per_epoch)
+    history = model.fit_generator(train_gen, epochs=epochs, steps_per_epoch=steps_per_epoch,
+                                  workers=4, max_queue_size=512)
 
     # I don't know maybe there is a nice way to infer
     # this from the gen but this is my method.  I use
@@ -243,7 +247,25 @@ def linear_eval(encoder, train_gen, dev_gen,
 
         for v in history.history['loss']:
             wandb.log({'linear_loss':v})
+
+
+def standardize_over_batches(model, flow, batches):
+    """ Accumulate over batches and return for normalization. """
+
+    dim = model.output.shape[1]
+    mu, sigma = np.zeros(shape=(dim,)), np.zeros(shape=(dim,))
+    
+    for batch in range(batches):
+        x_batch = next(flow)
+        preds = model.predict(x_batch)
+        mu += np.sum(preds, axis=0)
+        sigma += np.sum(preds**2, axis=0)
         
+    mu /= batches
+    sigma = (sigma - mu**2) / (batches - 1)
+    return mu, sigma
+
+
 if __name__ == "__main__":
     main(get_args())
 

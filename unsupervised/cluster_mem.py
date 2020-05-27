@@ -99,10 +99,10 @@ def get_args():
     ap = argparse.ArgumentParser()
     ap.add_argument('--base_dir', type=str, default='/home/ubuntu/data')
     ap.add_argument('--min_samples', type=int, default=320)
-    ap.add_argument('--backbone', type=str, default='ResNet50')
+    ap.add_argument('--backbone', type=str, default='InceptionV3')
     ap.add_argument('--pooling', type=str, default='avg')
     ap.add_argument('--min_dbscan_samples', type=int, default=10)
-    ap.add_argument('--eps', type=float, default=0.01)
+    ap.add_argument('--eps', type=float, default=24.99)
     ap.add_argument('--normalize', type=str, default=None)
     return ap.parse_args()
 

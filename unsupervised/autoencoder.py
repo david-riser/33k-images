@@ -85,19 +85,19 @@ def build_model(input_shape):
     # 224 ---> 112
     x = dconv(inputs, filters=16, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_pool=True, use_batchnorm=True)
+              use_pool=True, use_batchnorm=False)
     # 112 ---> 56
     x = dconv(x, filters=16, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_pool=True, use_batchnorm=True)
+              use_pool=True, use_batchnorm=False)
     # 56 ---> 28
     x = dconv(x, filters=16, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_pool=True, use_batchnorm=True)
+              use_pool=True, use_batchnorm=False)
     # 28 ---> 14
     x = dconv(x, filters=16, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_pool=True, use_batchnorm=True)
+              use_pool=True, use_batchnorm=False)
 
     # Filter reduction
     x = Conv2D(filters=4, kernel_size=(3,3),
@@ -109,17 +109,17 @@ def build_model(input_shape):
     # 14 ---> 28
     x = uconv(x, filters=16, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_batchnorm=True)
+              use_batchnorm=False)
 
     # 28 ---> 56
     x = uconv(x, filters=16, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_batchnorm=True)
+              use_batchnorm=False)
 
     # 56 ---> 112
     x = uconv(x, filters=16, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_batchnorm=True)
+              use_batchnorm=False)
 
     # 224 ---> 224
     x = uconv(x, filters=16, kernel_size=(3,3),

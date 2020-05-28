@@ -49,13 +49,22 @@ def main(args):
 
     # Load the features for the dev set which we
     # are going to cluster up.
-    features = np.zeros(shape=(len(dev),encoder.output.shape[1]))
+    features = np.zeros(
+        shape=(len(train) + len(dev), encoder.output.shape[1])
+    )
+    for i, imagefile in enumerate(train['file']):
+        img = load_image(
+            image_path=os.path.join(args.base_dir, 'train/' + imagefile),
+            preprocess_input=preprocess
+        )
+        features[i,:] = encoder.predict(img)
+
     for i, imagefile in enumerate(dev['file']):
         img = load_image(
             image_path=os.path.join(args.base_dir, 'dev/' + imagefile),
             preprocess_input=preprocess
         )
-        features[i,:] = encoder.predict(img)
+        features[i + len(train),:] = encoder.predict(img)
 
     # Scale before doing PCA, which
     # expects to have standardized
@@ -83,14 +92,14 @@ def main(args):
     pd.DataFrame({
         'file':dev['file'],
         'label':dev['label'],
-        'pred':dbscan.labels_
+        'pred':dbscan.labels_[len(train):]
     }).to_csv('dev_dbscan_pca_ms{}_{}.csv'.format(args.min_samples, wandb.run.id),
               index=False)
 
     # A quick performance estimate.
-    ar_score = adjusted_rand_score(dev['label'], dbscan.labels_)
+    ar_score = adjusted_rand_score(dev['label'], dbscan.labels_[len(train):])
     wandb.log({'ari':ar_score})
-    wandb.log({'nmi':normalized_mutual_info_score(dev['label'], dbscan.labels_)})
+    wandb.log({'nmi':normalized_mutual_info_score(dev['label'], dbscan.labels_[len(train):])})
 
     if args.pca_components > 0:
         wandb.log({'explained_variance':np.sum(pca.explained_variance_ratio_)})
@@ -108,11 +117,11 @@ def get_args():
     ap = argparse.ArgumentParser()
     ap.add_argument('--base_dir', type=str, default='/home/ubuntu/data')
     ap.add_argument('--min_samples', type=int, default=320)
-    ap.add_argument('--backbone', type=str, default='ResNet50')
+    ap.add_argument('--backbone', type=str, default='Xception')
     ap.add_argument('--pooling', type=str, default='avg')
     ap.add_argument('--min_dbscan_samples', type=int, default=10)
-    ap.add_argument('--eps', type=float, default=0.01)
-    ap.add_argument('--pca_components', type=int, default=0)
+    ap.add_argument('--eps', type=float, default=24.5)
+    ap.add_argument('--pca_components', type=int, default=64)
     return ap.parse_args()
 
 def load_dataframes(data_dir, min_samples):

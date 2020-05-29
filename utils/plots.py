@@ -101,6 +101,19 @@ def plot_images(images, preds, labels, name,
             axs[row,col].set_xticklabels([])
             axs[row,col].set_yticklabels([])
             axs[row,col].set_title(preds[index])
+
+
+        # Pad out the last page with empty
+        # figures so we don't have repeats.
+        for i in range(len(preds), (total_pages + 1) * nrows * ncols):
+            pad = 1 + i % (ncols * nrows)
+            row = (pad - 1) // ncols
+            col = (pad - 1) % ncols
+            
+            x = np.zeros(images[0].shape)
+            axs[row,col].imshow(x)
+            axs[row,col].set_xticklabels([])
+            axs[row,col].set_yticklabels([])
             
         # It is possible that the last
         # page has not been printed.

@@ -87,11 +87,14 @@ def main(args):
     kmeans.fit(features)
     
     # Save the dataframe of validation predictions and labels
-    pd.DataFrame({
+    df = pd.DataFrame({
         'file':dev['file'],
         'label':dev['label'],
         'pred':kmeans.labels_[len(train):]
-    }).to_csv('dev_kmeans_pca_ms{}_{}.csv'.format(args.min_samples, wandb.run.id),
+    })
+    df = add_soft_cluster_probs(df, features[len(train):], kmeans.cluster_centers_)
+    df = reindex_df_with_cluster_var(df, features[len(train):], kmeans.cluster_centers_)
+    df.to_csv('dev_kmeans_pca_ms{}_{}.csv'.format(args.min_samples, wandb.run.id),
               index=False)
 
     # A quick performance estimate.
@@ -153,7 +156,72 @@ def setup_wandb(args):
     )
 
     
+def reindex_df_with_cluster_var(df, features, centroids):
+    """ 
+    Re-index the dataframe by using the cluster variance. 
+    """
 
+    n_clusters, z_dim = centroids.shape
+
+    cluster_var = np.zeros(n_clusters)
+    for i in range(n_clusters):
+        indices = np.where(df['pred'] == i)[0]
+        cluster_var[i] = np.sum(
+            np.var(
+                features[indices, :], axis = 0
+            )
+        )
+
+    re_index = np.argsort(cluster_var)
+    mapping = { i:r for i,r in enumerate(re_index) }
+
+    df['pred'] = df['pred'].apply(lambda x: mapping[x])
+    return df
+    
+
+def soft_clustering_weights(data, cluster_centres, **kwargs):
+    
+    """
+    Function to calculate the weights from soft k-means
+    data: Array of data. shape = N x F, for N data points and F Features
+    cluster_centres: Array of cluster centres. shape = Nc x F, for Nc number of clusters. Input kmeans.cluster_centres_ directly.
+    param: m - keyword argument, fuzziness of the clustering. Default 2
+
+    Source:
+    https://towardsdatascience.com/confidence-in-k-means-d7d3a13ca856
+
+    """
+    
+    # Fuzziness parameter m>=1. Where m=1 => hard segmentation
+    m = 2
+    if 'm' in kwargs:
+        m = kwargs['m']
+    
+    Nclusters = cluster_centres.shape[0]
+    Ndp = data.shape[0]
+    Nfeatures = data.shape[1]
+
+    # Get distances from the cluster centres for each data point and each cluster
+    EuclidDist = np.zeros((Ndp, Nclusters))
+    for i in range(Nclusters):
+        EuclidDist[:,i] = np.sum((data-np.repeat(cluster_centres[i], Ndp))**2,axis=1)
+    
+    
+    # Denominator of the weight from wikipedia:
+    invWeight = EuclidDist**(2/(m-1))*np.matlib.repmat(np.sum((1./EuclidDist)**(2/(m-1)),axis=1).reshape(-1,1),1,Nclusters)
+    Weight = 1./invWeight
+    
+    return Weight
+
+def add_soft_cluster_probs(df, features, centroids):
+    """ 
+    Add soft k-means cluster probs to dataframe.
+    """
+    weights = soft_clustering_weights(features, centroids)
+    df['weight'] = weights
+    return df
+
+    
 if __name__ == "__main__":
     main(get_args())
 

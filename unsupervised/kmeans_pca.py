@@ -46,7 +46,8 @@ def main(args):
     # Load the images into memory.  Right now
     # I am not supporting loading from disk.
     train, dev = load_dataframes(args.base_dir, args.min_samples)
-
+    train = train[:1000]
+    
     # Load the features for the dev set which we
     # are going to cluster up.
     features = np.zeros(
@@ -179,46 +180,32 @@ def reindex_df_with_cluster_var(df, features, centroids):
     return df
     
 
-def soft_clustering_weights(data, cluster_centres, **kwargs):
-    
-    """
-    Function to calculate the weights from soft k-means
-    data: Array of data. shape = N x F, for N data points and F Features
-    cluster_centres: Array of cluster centres. shape = Nc x F, for Nc number of clusters. Input kmeans.cluster_centres_ directly.
-    param: m - keyword argument, fuzziness of the clustering. Default 2
+def soft_clustering_weights(data, cluster_centers):
 
-    Source:
-    https://towardsdatascience.com/confidence-in-k-means-d7d3a13ca856
+    samples, features = data.shape
+    centroids, _ = cluster_centers.shape
+    weights = np.zeros(data.shape)
 
-    """
-    
-    # Fuzziness parameter m>=1. Where m=1 => hard segmentation
-    m = 2
-    if 'm' in kwargs:
-        m = kwargs['m']
-    
-    Nclusters = cluster_centres.shape[0]
-    Ndp = data.shape[0]
-    Nfeatures = data.shape[1]
+    for i in range(samples):
+        for j in range(centroids):
 
-    # Get distances from the cluster centres for each data point and each cluster
-    EuclidDist = np.zeros((Ndp, Nclusters))
-    for i in range(Nclusters):
-        EuclidDist[:,i] = np.sum((data-np.repeat(cluster_centres[i], Ndp))**2,axis=1)
-    
-    
-    # Denominator of the weight from wikipedia:
-    invWeight = EuclidDist**(2/(m-1))*np.matlib.repmat(np.sum((1./EuclidDist)**(2/(m-1)),axis=1).reshape(-1,1),1,Nclusters)
-    Weight = 1./invWeight
-    
-    return Weight
+            distances = np.zeros(centroids)
+            for k in range(centroids):
+                distances[k] = np.linalg.norm(data[i,:] - cluster_centers[k,:])
 
+            # I eliminated the m factor and just used m = 2.
+            weights[i,j] = (np.sum(distances) / distances[j])**2
+            
+            
+    return weights
+            
+    
 def add_soft_cluster_probs(df, features, centroids):
     """ 
     Add soft k-means cluster probs to dataframe.
     """
     weights = soft_clustering_weights(features, centroids)
-    df['weight'] = weights
+    df['weight'] = np.max(weights, axis=1) / np.sum(weights, axis=1)
     return df
 
     

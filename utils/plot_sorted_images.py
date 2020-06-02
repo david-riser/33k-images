@@ -24,7 +24,6 @@ def get_args():
     parser.add_argument('--data', default='/home/ubuntu/data/dev', type=str)
     parser.add_argument('--clusters', type=int, default=5)
     parser.add_argument('--samples', type=int, default=10)
-    parser.add_argument('--worst', action='store_true')
     parser.add_argument('--output_dir', type=str, default='/home/ubuntu')
     parser.add_argument('--weight_col', type=str, default='weight')
     return parser.parse_args()
@@ -39,10 +38,16 @@ def main(args):
     # Choose randomly from the classes we have to
     # display some images.
     targets = random.sample(
-        set(dataset['label'].unique()), args.clusters
+        set(dataset['pred'].unique()), args.clusters
     )
     print(targets)
+    hexcode = "".join(random.sample(list(string.hexdigits), 8))
+    plot(args, dataset, targets, hexcode, worst=True)
+    plot(args, dataset, targets, hexcode, worst=False)
+
     
+def plot(args, dataset, targets, hexcode, worst=True):
+
     # Iterate on classes and plot the figure
     fig, axs = plt.subplots(
         nrows=args.clusters, ncols=args.samples,
@@ -56,13 +61,14 @@ def main(args):
         samples = []
         target = targets[i]
 
-        data = dataset[dataset['label'] == target]
-        data.sort_values(args.weight_col, ascending=True)
+        data = dataset[dataset['pred'] == target]
+        data = data.sort_values(args.weight_col, ascending=True)
 
-        if args.worst:
-            samples = data[-args.samples:]
-        else:
+        if worst:
             samples = data[:args.samples]
+        else:
+            samples = data[-args.samples:]
+
 
         for j, sample in enumerate(samples['file']):
             axs[i,j].imshow(
@@ -75,7 +81,9 @@ def main(args):
             axs[i,j].set_yticks([])
 
     fig.tight_layout()
-    fig.savefig(args.output_dir + '/sorted_' + str(args.worst) + "".join(random.sample(list(string.hexdigits), 8)) + '.png')        
+
+    worst_str = "worst" if worst else "best"
+    fig.savefig(args.output_dir + '/sorted_' + hexcode + "_" + worst_str + '.png')        
 
 
 def get_empty_image(shape=(224,224,3)):

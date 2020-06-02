@@ -20,6 +20,7 @@ print(PROJECT_DIR)
 sys.path.append(PROJECT_DIR)
 
 from project_core.models import model_factory, LinearModel
+from project_core.metrics import hungarian_balanced_accuracy
 from project_core.utils import load_image, build_files_dataframe, prune_file_list
 from sklearn.cluster import MiniBatchKMeans, AgglomerativeClustering
 from sklearn.decomposition import PCA
@@ -88,11 +89,12 @@ def main(args):
     agglom.fit(features)
     
     # Save the dataframe of validation predictions and labels
-    pd.DataFrame({
+    df = pd.DataFrame({
         'file':dev['file'],
         'label':dev['label'],
         'pred':agglom.labels_[len(train):]
-    }).to_csv('dev_agglom_pca_ms{}_{}.csv'.format(args.min_samples, wandb.run.id),
+    })
+    df.to_csv('dev_agglom_pca_ms{}_{}.csv'.format(args.min_samples, wandb.run.id),
               index=False)
 
     # A quick performance estimate.
@@ -104,6 +106,14 @@ def main(args):
         wandb.log({'explained_variance':np.sum(pca.explained_variance_ratio_)})
     else:
         wandb.log({'explained_variance':0.00})
+
+    # if the number of clusters is the same as
+    # the true labels, we can do hungarian
+    if args.clusters == dev['label'].nunique():
+        hba = hungarian_balanced_accuracy(
+            LabelEncoder().fit_transform(df['label']), df['pred']
+        )
+        wandb.log({'balanced_accuracy':hba})
                     
     print('[INFO] Finished!')
     

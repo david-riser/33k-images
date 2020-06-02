@@ -4,10 +4,14 @@ import numpy as np
 import pandas as pd
 import os
 import sys
+import tensorflow as tf
+import wandb
+
 
 PROJECT_DIR = os.path.abspath(os.path.join(os.getcwd(), '../'))
 sys.path.append(PROJECT_DIR)
 
+from sklearn.metrics import balanced_accuracy_score
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications.resnet50 import preprocess_input
@@ -15,13 +19,14 @@ from tensorflow.keras.callbacks import (ModelCheckpoint,
                                         EarlyStopping,
                                         ReduceLROnPlateau)
 from tensorflow.keras.metrics import TopKCategoricalAccuracy, Precision, Recall
+from tensorflow.keras.metrics import Accuracy
 from tensorflow.keras.models import load_model
 
 # This project
 from network import build_model
 from project_core.utils import build_files_dataframe, prune_file_list
 
-
+    
 def get_args():
     ap = argparse.ArgumentParser()
     ap.add_argument('--base_dir', type=str, required=True)
@@ -30,7 +35,23 @@ def get_args():
     ap.add_argument('--batch_size', type=int, default=32)
     ap.add_argument('--batches_per_epoch', type=int, default=50)
     ap.add_argument('--max_epochs', type=int, default=5)
+    ap.add_argument('--backbone', type=str, default='ResNet50')
+    ap.add_argument('--pooling', type=str, default='avg')
     return ap.parse_args()
+
+
+def setup_wandb(args):
+    config = dict(
+        architecture = ":".join([args.backbone, args.pooling]),
+        min_samples = args.min_samples,
+        batch_size = args.batch_size
+    )
+    wandb.init(
+        project='33ku',
+        notes='Supervised',
+        tags=['Supervised'],
+        config=config
+    )
 
 def plot_loss(history, name):
     """ Plot training and validation loss. """
@@ -98,7 +119,8 @@ def load_data(base_dir, min_samples):
 if __name__ == "__main__":
 
     args = get_args()
-
+    setup_wandb(args)
+    
     params = {
         'batch_size':args.batch_size,
         'batches_per_epoch':args.batches_per_epoch,
@@ -170,8 +192,18 @@ if __name__ == "__main__":
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=metrics)
     history = model.fit_generator(train_flow, steps_per_epoch=params['batches_per_epoch'], epochs=args.max_epochs,
                                   validation_data=valid_flow, workers=4, callbacks=callbacks)
-
-
+ 
+    for epoch in range(len(history.history['loss'])):
+        wandb.log(
+            {
+                'epoch':epoch,
+                'loss':history.history['loss'][epoch],
+                'val_loss':history.history['val_loss'][epoch],
+                'accuracy':history.history['accuracy'][epoch],
+                'val_accuracy':history.history['val_accuracy'][epoch]
+            }
+        )
+    
     # Train the entire network
     model = load_model('weights_{}.hdf5'.format(args.experiment))
 
@@ -190,6 +222,17 @@ if __name__ == "__main__":
     history_stage2 = model.fit_generator(train_flow, steps_per_epoch=params['batches_per_epoch'],
                                          epochs=args.max_epochs, validation_data=valid_flow,
                                          workers=4, callbacks=callbacks)
+    start = len(history.history['loss'])
+    for epoch in range(len(history_stage2.history['loss'])):
+        wandb.log(
+            {
+                'epoch':epoch + start,
+                'loss':history_stage2.history['loss'][epoch],
+                'val_loss':history_stage2.history['val_loss'][epoch],
+                'accuracy':history_stage2.history['accuracy'][epoch],
+                'val_accuracy':history_stage2.history['val_accuracy'][epoch]
+            }
+        )
 
     # Combine history
     for key in history.history.keys():
@@ -205,4 +248,16 @@ if __name__ == "__main__":
     # Save validation folds with class encoded value
     encoding = train_flow.class_indices
     dev['encoded_label'] = dev['label'].apply(lambda x: encoding[x])
-    dev.to_csv('dev_ms{}_{}.csv'.format(args.min_samples, args.experiment), index=False)
+
+    model = load_model('weights_{}.hdf5'.format(args.experiment))
+    test_batches = len(dev) // args.batch_size
+    preds = np.zeros(test_batches * args.batch_size)
+    trues = np.zeros(test_batches * args.batch_size)
+    for i in range(test_batches):
+        x_batch, y_batch = next(valid_flow)
+        preds[i * args.batch_size : (i + 1) * args.batch_size] = np.argmax(model.predict(x_batch), axis=1)
+        trues[i * args.batch_size : (i + 1) * args.batch_size] = np.argmax(y_batch, axis=1)
+
+    wandb.log({'balanced_accuracy':balanced_accuracy_score(trues, preds)})
+    dev.to_csv('dev_{}.csv'.format(wandb.run.id), index=False)
+        

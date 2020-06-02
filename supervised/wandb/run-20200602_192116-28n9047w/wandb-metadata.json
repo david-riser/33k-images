@@ -1,0 +1,35 @@
+{
+    "root": "/home/ubuntu/33k-images",
+    "program": "main.py",
+    "git": {
+        "remote": "https://github.com/david-riser/33k-images",
+        "commit": "a9275a40b30d68dfd4515ab47cbf20a28f02a53d"
+    },
+    "email": null,
+    "startedAt": "2020-06-02T19:21:16.557233",
+    "host": "ip-172-31-23-155",
+    "username": "ubuntu",
+    "executable": "/home/ubuntu/anaconda3/envs/tensorflow2_p36/bin/python",
+    "os": "Linux-5.3.0-1019-aws-x86_64-with-debian-buster-sid",
+    "python": "3.6.10",
+    "gpu": "Tesla M60",
+    "gpu_count": 1,
+    "cpu_count": 4,
+    "cuda": "10.0.130",
+    "args": [
+        "--base_dir=/home/ubuntu/data",
+        "--experiment=None",
+        "--min_samples=500",
+        "--max_epochs=1",
+        "--batch_size=16",
+        "--backbone=InceptionV3",
+        "--pooling=max"
+    ],
+    "state": "finished",
+    "jobType": null,
+    "mode": "run",
+    "notes": "Supervised",
+    "project": "33ku",
+    "heartbeatAt": "2020-06-02T19:23:08.449415",
+    "exitcode": 0
+}

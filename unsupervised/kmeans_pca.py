@@ -21,6 +21,7 @@ sys.path.append(PROJECT_DIR)
 
 from project_core.models import model_factory, LinearModel
 from project_core.utils import load_image, build_files_dataframe, prune_file_list
+from project_core.metrics import hungarian_balanced_accuracy
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics import (adjusted_rand_score, balanced_accuracy_score,
@@ -46,7 +47,6 @@ def main(args):
     # Load the images into memory.  Right now
     # I am not supporting loading from disk.
     train, dev = load_dataframes(args.base_dir, args.min_samples)
-    train = train[:1000]
     
     # Load the features for the dev set which we
     # are going to cluster up.
@@ -110,7 +110,15 @@ def main(args):
         wandb.log({'explained_variance':np.sum(pca.explained_variance_ratio_)})
     else:
         wandb.log({'explained_variance':0.00})
-                    
+
+    # if the number of clusters is the same as
+    # the true labels, we can do hungarian
+    if args.clusters == dev['label'].nunique():
+        hba = hungarian_balanced_accuracy(
+            LabelEncoder().fit_transform(df['label']), df['pred']
+        )
+        wandb.log({'balanced_accuracy':hba})
+        
     print('[INFO] Finished!')
     
 def get_args():

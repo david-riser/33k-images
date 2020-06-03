@@ -180,8 +180,8 @@ if __name__ == "__main__":
 
     model_checkpoint = ModelCheckpoint(filepath='weights_{}.hdf5'.format(args.experiment),
                                        monitor='val_loss')
-    early_stopping = EarlyStopping(monitor='val_loss', patience=12)
-    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=6)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=6)
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3)
     callbacks = [model_checkpoint, early_stopping, reduce_lr]
 
     top3_metric = TopKCategoricalAccuracy(k=3, name='top_3_cat_acc')

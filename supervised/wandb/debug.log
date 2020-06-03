@@ -970,14 +970,14 @@
 2020-06-03 00:22:10,639 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
 2020-06-03 00:22:25,646 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
 2020-06-03 00:22:26,646 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
-y:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
-2020-06-03 00:15:22,472 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
-2020-06-03 00:15:29,475 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
-2020-06-03 00:15:45,481 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
-2020-06-03 00:15:52,484 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
-2020-06-03 00:16:01,488 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
-2020-06-03 00:16:17,494 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
-2020-06-03 00:16:22,496 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
+2020-06-03 00:22:42,652 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+2020-06-03 00:22:55,657 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
+2020-06-03 00:22:58,659 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+2020-06-03 00:23:14,665 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+2020-06-03 00:23:25,670 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
+2020-06-03 00:23:30,672 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+2020-06-03 00:23:46,679 INFO    Thread-4  :13775 [run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+3 00:16:22,496 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
 2020-06-03 00:16:33,501 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
 2020-06-03 00:16:49,507 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
 2020-06-03 00:16:52,509 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
@@ -1013,3 +1013,10 @@ y:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised
 2020-06-03 00:22:10,639 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
 2020-06-03 00:22:25,646 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
 2020-06-03 00:22:26,646 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+2020-06-03 00:22:42,652 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+2020-06-03 00:22:55,657 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
+2020-06-03 00:22:58,659 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+2020-06-03 00:23:14,665 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+2020-06-03 00:23:25,670 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-events.jsonl
+2020-06-03 00:23:30,672 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json
+2020-06-03 00:23:46,679 INFO    Thread-4  :13775 [892agu40:run_manager.py:_on_file_modified():691] file/dir modified: /home/ubuntu/33k-images/supervised/wandb/run-20200602_215651-892agu40/wandb-metadata.json

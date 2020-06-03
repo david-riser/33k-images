@@ -1,1 +1,0 @@
-2020-06-03 00:25:20.088911: F ./tensorflow/core/kernels/random_op_gpu.h:232] Non-OK-status: GpuLaunchKernel(FillPhiloxRandomKernelLaunch<Distribution>, num_blocks, block_size, 0, d.stream(), gen, data, size, dist) status: Internal: out of memory

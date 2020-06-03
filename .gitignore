@@ -6,4 +6,5 @@
 *hdf5
 .idea
 
-unsupervised/wandb/* 
+unsupervised/wandb/*
+supervised/wandb/* 

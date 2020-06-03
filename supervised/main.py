@@ -47,7 +47,7 @@ def setup_wandb(args):
         batch_size = args.batch_size
     )
     wandb.init(
-        project='33ku',
+        project='33ks',
         notes='Supervised',
         tags=['Supervised'],
         config=config
@@ -113,8 +113,16 @@ def load_data(base_dir, min_samples):
     return_cols = list(dev.columns)
     dev['keep'] = dev['label'].apply(lambda x: x in classes)
     dev = dev[dev['keep'] == True]
-    
-    return train, dev[return_cols]
+
+    # Load test set and return it
+    test = build_files_dataframe(os.path.join(args.base_dir, 'test'))
+    print(test.head())
+    test = test.sample(frac=1).reset_index(drop=True)
+    return_cols = list(test.columns)
+    test['keep'] = test['label'].apply(lambda x: x in classes)
+    test = test[test['keep'] == True]
+
+    return train, dev[return_cols], test[return_cols]
 
 if __name__ == "__main__":
 
@@ -130,7 +138,7 @@ if __name__ == "__main__":
     # Load and shuffle image path.  Also
     # encode the labels as integers for
     # ease of metric calculation later.
-    train, dev = load_data(args.base_dir, args.min_samples)
+    train, dev, test = load_data(args.base_dir, args.min_samples)
     
     # Calculate shapes for training
     input_shape = (224,224,3)
@@ -162,6 +170,16 @@ if __name__ == "__main__":
     valid_flow = valid_gen.flow_from_dataframe(
         dataframe=dev,
         directory=os.path.join(args.base_dir, 'dev'),
+        batch_size=params['batch_size'],
+        target_size=input_shape[:2],
+        shuffle=True,
+        x_col='file',
+        y_col='label',
+        class_mode='categorical'
+    )
+    test_flow = valid_gen.flow_from_dataframe(
+        dataframe=test,
+        directory=os.path.join(args.base_dir, 'test'),
         batch_size=params['batch_size'],
         target_size=input_shape[:2],
         shuffle=True,
@@ -250,14 +268,23 @@ if __name__ == "__main__":
     dev['encoded_label'] = dev['label'].apply(lambda x: encoding[x])
 
     model = load_model('weights_{}.hdf5'.format(args.experiment))
-    test_batches = len(dev) // args.batch_size
-    preds = np.zeros(test_batches * args.batch_size)
-    trues = np.zeros(test_batches * args.batch_size)
-    for i in range(test_batches):
-        x_batch, y_batch = next(valid_flow)
-        preds[i * args.batch_size : (i + 1) * args.batch_size] = np.argmax(model.predict(x_batch), axis=1)
-        trues[i * args.batch_size : (i + 1) * args.batch_size] = np.argmax(y_batch, axis=1)
 
-    wandb.log({'balanced_accuracy':balanced_accuracy_score(trues, preds)})
+    dev_batches = int(np.ceil(len(dev) // args.batch_size))
+    preds, trues = [], []
+    for i in range(dev_batches):
+        x_batch, y_batch = next(valid_flow)
+        preds.extend(np.argmax(model.predict(x_batch), axis=1))
+        trues.extend(np.argmax(y_batch, axis=1))
+
+    wandb.log({'dev_balanced_accuracy':balanced_accuracy_score(trues, preds)})
     dev.to_csv('dev_{}.csv'.format(wandb.run.id), index=False)
+
+    test_batches = int(np.ceil(len(test) // args.batch_size))
+    preds, trues = [], []
+    for i in range(test_batches):
+        x_batch, y_batch = next(test_flow)
+        preds.extend(np.argmax(model.predict(x_batch), axis=1))
+        trues.extend(np.argmax(y_batch, axis=1))
+
+    wandb.log({'test_balanced_accuracy':balanced_accuracy_score(trues, preds)})
         

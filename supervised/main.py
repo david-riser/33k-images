@@ -29,12 +29,12 @@ from project_core.utils import build_files_dataframe, prune_file_list
     
 def get_args():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--base_dir', type=str, required=True)
-    ap.add_argument('--experiment', type=str, required=True)
-    ap.add_argument('--min_samples', type=int, default=80)
+    ap.add_argument('--base_dir', type=str, default="/home/ubuntu/data")
+    ap.add_argument('--experiment', type=str, default="none")
+    ap.add_argument('--min_samples', type=int, default=320)
     ap.add_argument('--batch_size', type=int, default=32)
     ap.add_argument('--batches_per_epoch', type=int, default=50)
-    ap.add_argument('--max_epochs', type=int, default=5)
+    ap.add_argument('--max_epochs', type=int, default=100)
     ap.add_argument('--backbone', type=str, default='ResNet50')
     ap.add_argument('--pooling', type=str, default='avg')
     return ap.parse_args()

@@ -262,7 +262,7 @@ if __name__ == "__main__":
     recall_metric = Recall()
     metrics = ['accuracy', top3_metric, precision_metric, recall_metric]
 
-    model.compile(optimizer=Adam(0.001), loss='categorical_crossentropy', metrics=metrics)
+    model.compile(optimizer=Adam(0.0001, 0.9, 0.99), loss='categorical_crossentropy', metrics=metrics)
     history = model.fit_generator(train_flow, steps_per_epoch=params['batches_per_epoch'], epochs=args.max_epochs,
                                   validation_data=valid_flow, workers=4, callbacks=callbacks)
     #history = model.fit_generator(train_flow, steps_per_epoch=params['batches_per_epoch'], epochs=4,

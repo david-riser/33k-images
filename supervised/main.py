@@ -11,21 +11,23 @@ import wandb
 PROJECT_DIR = os.path.abspath(os.path.join(os.getcwd(), '../'))
 sys.path.append(PROJECT_DIR)
 
-from sklearn.metrics import balanced_accuracy_score
-from tensorflow.keras.optimizers import SGD
+from sklearn.metrics import accuracy_score, balanced_accuracy_score
+from sklearn.utils import resample
+from tensorflow.keras import Model
+from tensorflow.keras.optimizers import Adam, SGD
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.callbacks import (ModelCheckpoint,
                                         EarlyStopping,
                                         ReduceLROnPlateau)
+from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.metrics import TopKCategoricalAccuracy, Precision, Recall
 from tensorflow.keras.metrics import Accuracy
 from tensorflow.keras.models import load_model
 
 # This project
-from network import build_model
 from project_core.utils import build_files_dataframe, prune_file_list
-
+from project_core.models import model_factory
     
 def get_args():
     ap = argparse.ArgumentParser()
@@ -37,6 +39,9 @@ def get_args():
     ap.add_argument('--max_epochs', type=int, default=100)
     ap.add_argument('--backbone', type=str, default='ResNet50')
     ap.add_argument('--pooling', type=str, default='avg')
+    ap.add_argument('--dense_nodes', type=int, default=0)
+    ap.add_argument('--dropout', type=float, default=0.0)
+    ap.add_argument('--images_per_class', type=int, default=-1)
     return ap.parse_args()
 
 
@@ -49,7 +54,7 @@ def setup_wandb(args):
     wandb.init(
         project='33ks',
         notes='Supervised',
-        tags=['Supervised'],
+        tags=['Supervised', 'Linear'],
         config=config
     )
 
@@ -94,7 +99,7 @@ def list_metrics(history):
 
     return metrics
 
-def load_data(base_dir, min_samples):
+def load_data(base_dir, min_samples, images_per_class=None):
     
     train = build_files_dataframe(os.path.join(args.base_dir, 'train'))
     print(train.head())
@@ -106,6 +111,34 @@ def load_data(base_dir, min_samples):
     # in our dev set.
     classes = np.unique(train['label'])
 
+    # We either get None or some
+    # integer which specifies the
+    # target number of samples.
+    if images_per_class:
+
+        counts = {}
+        for c in classes:
+            counts[c] = len(train[train['label'] == c])
+
+        if images_per_class > max(counts.values()):
+            print(("[FATAL] The number of images per class requested is larger than "
+                   " the number of samples in the majority class.  This is a fatal error!"))
+            exit()
+
+        train_dataframes = []
+        for c in classes:
+            train_dataframes.append(
+                resample(
+                    train,
+                    replace=True,
+                    n_samples=images_per_class
+                )
+            )
+
+        # Replace the training dataframe by the resampled stuffs
+        # here.
+        train = pd.concat(train_dataframes)
+            
     # Load dev set and return it
     dev = build_files_dataframe(os.path.join(args.base_dir, 'dev'))
     print(dev.head())
@@ -138,7 +171,13 @@ if __name__ == "__main__":
     # Load and shuffle image path.  Also
     # encode the labels as integers for
     # ease of metric calculation later.
-    train, dev, test = load_data(args.base_dir, args.min_samples)
+    if args.images_per_class > 0:
+        images_per_class = args.images_per_class
+    else:
+        images_per_class = None
+
+    train, dev, test = load_data(args.base_dir, args.min_samples,
+                                 images_per_class=images_per_class)
     
     # Calculate shapes for training
     input_shape = (224,224,3)
@@ -189,7 +228,23 @@ if __name__ == "__main__":
     )
 
     # Build model and freeze most of it.
-    model = build_model(input_shape, output_shape)
+    backbone, _ = model_factory(args.backbone, args.pooling)
+
+    if args.dense_nodes > 0:
+        x = Dense(args.dense_nodes, activation='relu')(backbone.output)
+
+        if args.dropout > 0:
+            x = Dropout(args.dropout)(x)
+
+        output = Dense(output_shape, activation='softmax')(x)
+
+    else:
+        output = Dense(output_shape, activation='softmax')(backbone.output)
+
+    model = Model(backbone.input, output)
+
+
+    #input_shape, output_shape)
     for layer in model.layers[:-2]:
         layer.trainable = False
 
@@ -207,9 +262,11 @@ if __name__ == "__main__":
     recall_metric = Recall()
     metrics = ['accuracy', top3_metric, precision_metric, recall_metric]
 
-    model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=metrics)
+    model.compile(optimizer=Adam(0.001), loss='categorical_crossentropy', metrics=metrics)
     history = model.fit_generator(train_flow, steps_per_epoch=params['batches_per_epoch'], epochs=args.max_epochs,
                                   validation_data=valid_flow, workers=4, callbacks=callbacks)
+    #history = model.fit_generator(train_flow, steps_per_epoch=params['batches_per_epoch'], epochs=4,
+    #                              validation_data=valid_flow, workers=4, callbacks=callbacks)
  
     for epoch in range(len(history.history['loss'])):
         wandb.log(
@@ -223,6 +280,7 @@ if __name__ == "__main__":
         )
     
     # Train the entire network
+    """
     model = load_model('weights_{}.hdf5'.format(args.experiment))
 
     for layer in model.layers:
@@ -233,6 +291,11 @@ if __name__ == "__main__":
         loss='categorical_crossentropy',
         metrics=metrics
     )
+    #model.compile(
+    #    optimizer=Adam(lr=0.001),
+    #    loss='categorical_crossentropy',
+    #    metrics=metrics
+    #)
 
     model_checkpoint = ModelCheckpoint(filepath='weights_stage2_{}.hdf5'.format(args.experiment),
                                        monitor='val_loss')
@@ -258,6 +321,7 @@ if __name__ == "__main__":
             history.history[key].extend(
                 history_stage2.history[key]
             )
+    """
     
     # Plot metrics
     plot_loss(history=history, name=args.experiment)
@@ -277,6 +341,7 @@ if __name__ == "__main__":
         trues.extend(np.argmax(y_batch, axis=1))
 
     wandb.log({'dev_balanced_accuracy':balanced_accuracy_score(trues, preds)})
+    wandb.log({'dev_accuracy':accuracy_score(trues, preds)})
     dev.to_csv('dev_{}.csv'.format(wandb.run.id), index=False)
 
     test_batches = int(np.ceil(len(test) // args.batch_size))
@@ -287,4 +352,4 @@ if __name__ == "__main__":
         trues.extend(np.argmax(y_batch, axis=1))
 
     wandb.log({'test_balanced_accuracy':balanced_accuracy_score(trues, preds)})
-        
+    wandb.log({'test_accuracy':accuracy_score(trues, preds)})

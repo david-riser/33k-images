@@ -1,0 +1,17 @@
+2020-06-03 12:18:09,163 INFO    MainThread:2775 [wandb_agent.py:run():194] Running runs: []
+2020-06-03 12:18:09,364 INFO    MainThread:2775 [wandb_agent.py:_process_command():256] Agent received command: run
+2020-06-03 12:18:09,364 INFO    MainThread:2775 [wandb_agent.py:_command_run():286] Agent starting run with config:
+	backbone: ResNet50
+	min_samples: 320
+	pooling: avg
+2020-06-03 12:18:09,366 DEBUG   MainThread:2775 [wandb_config.py:_load_defaults():128] wandb dir not provided, skipping defaults
+2020-06-03 12:18:09,418 INFO    MainThread:2775 [wandb_agent.py:_command_run():325] About to run command: /usr/bin/env python main.py --backbone=ResNet50 --min_samples=320 --pooling=avg
+2020-06-03 12:18:14,427 INFO    MainThread:2775 [wandb_agent.py:run():194] Running runs: ['ly56tldu']
+2020-06-03 12:18:14,428 INFO    MainThread:2775 [wandb_agent.py:run():209] Cleaning up finished run: ly56tldu
+2020-06-03 12:18:14,589 INFO    MainThread:2775 [wandb_agent.py:_process_command():256] Agent received command: run
+2020-06-03 12:18:14,589 INFO    MainThread:2775 [wandb_agent.py:_command_run():286] Agent starting run with config:
+	backbone: ResNet50
+	min_samples: 320
+	pooling: max
+2020-06-03 12:18:14,592 DEBUG   MainThread:2775 [wandb_config.py:_load_defaults():128] wandb dir not provided, skipping defaults
+2020-06-03 12:18:14,641 INFO    MainThread:2775 [wandb_agent.py:_command_run():325] About to run command: /usr/bin/env python main.py --backbone=ResNet50 --min_samples=320 --pooling=max

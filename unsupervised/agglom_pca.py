@@ -20,7 +20,7 @@ print(PROJECT_DIR)
 sys.path.append(PROJECT_DIR)
 
 from project_core.models import model_factory, LinearModel
-from project_core.metrics import hungarian_balanced_accuracy
+from project_core.metrics import hungarian_balanced_accuracy, hungarian_accuracy
 from project_core.utils import load_image, build_files_dataframe, prune_file_list
 from sklearn.cluster import MiniBatchKMeans, AgglomerativeClustering
 from sklearn.decomposition import PCA
@@ -114,6 +114,10 @@ def main(args):
             LabelEncoder().fit_transform(df['label']), df['pred']
         )
         wandb.log({'balanced_accuracy':hba})
+        hba = hungarian_accuracy(
+            LabelEncoder().fit_transform(df['label']), df['pred']
+        )
+        wandb.log({'accuracy':hba})
                     
     print('[INFO] Finished!')
     

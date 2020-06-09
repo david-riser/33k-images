@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     # Setup the workspace
     data = "/home/ubuntu/data/dev"
-    dataframe = f"/home/ubuntu/33k-images/unsupervised/dev_kmeans_pca_ms320_{args.code}.csv"
+    dataframe = f"/home/ubuntu/33k-images/unsupervised/dev_agglom_pca_ms320_{args.code}.csv"
     pdf = f"/home/ubuntu/{args.code}.pdf"
 
     # Execute command.

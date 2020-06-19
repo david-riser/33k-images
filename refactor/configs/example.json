@@ -4,18 +4,19 @@
     },
     "data_loader": {
 	"name": "data_loader.InMemoryDataLoader",
+	"base_dir": "/home/ubuntu/data",
 	"batch_size": 32,
 	"min_samples": 320 
     },
     "model":{
-	"name": "pretrained_models.PretrainedLinearModel",
+	"name": "pretrained_model.PretrainedLinearModel",
 	"learning_rate": 0.001,
 	"optimizer": "adam",
 	"backbone": "ResNet50",
 	"pooling": "avg"
     },
     "trainer":{
-	"name": "pretrained_trainer.SoftmaxTrainer",
+	"name": "supervised_trainer.SupervisedTrainer",
 	"num_epochs": 5,
 	"verbose_training": true
     },
@@ -24,15 +25,13 @@
 	"checkpoint_mode": "min",
 	"checkpoint_save_best_only": true,
 	"checkpoint_save_weights_only": true,
-	"checkpoint_verbose": true
+	"checkpoint_verbose": true,
+	"checkpoint_dir": "/home/ubuntu/checkpoints/"
     },
     "evaluators":[
 	{
-	    "name": "test_evaluator.TestEvaluator"
-	},
-	{
 	    "name": "cifar_evaluator.CifarEvaluator",
-	    "output_name": "/home/ubuntu/cifar_test_images.pdf",
+	    "output_name": "/home/ubuntu/test_images.pdf",
 	    "nrows": 6,
 	    "ncols": 5,
 	    "samples": 320,

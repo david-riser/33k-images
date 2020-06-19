@@ -1,17 +1,22 @@
+import numpy as np
+import os
 import pandas as pd
 
 from base.base_data_loader import BaseDataLoader
 from utils.factory import create
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
+from tensorflow.keras.preprocessing.image import load_img
 
 class DataLoader(BaseDataLoader):
+
     def __init__(self, config):
-        super(DataLoader).__init__(config)
+        super(DataLoader, self).__init__(config)
 
     def build_files_dataframe(self, distr):
+        """ Search a directory tree to build a list of files 
+        and their labels. """
         files, labels = [], []
-
+        
         for folder, _, the_files in os.walk(os.path.join(self.config.data_loader.base_dir, distr)):
             if folder != self.config.data_loader.base_dir:
                 label = folder.split('/')[-1]
@@ -23,28 +28,29 @@ class DataLoader(BaseDataLoader):
         return data
 
 
-    def prune_files_list(self):
-    """     
-    Given a list of files, prune the list to contain 
-    only the entries for which the label specified by
-    label_col contains at least min_samples.
+    def prune_files_list(self, data):
+        """ Remove classes which contain less than min_samples. """
+        return_cols = list(data.columns)    
+        keep = data.groupby('label').transform(
+            lambda x: len(x) > self.config.data_loader.min_samples
+        ).values
+
+        return data.iloc[keep][return_cols]
+
+
+    def drop_other_classes(self, data, classes):
+        """ Drop any other class from the dataframe 
+        that does not exist in the classes list. """
+        keep = data['label'].apply(
+            lambda x: x in classes
+        )
+        return data.iloc[np.where(keep == True)[0]]
+
     
-    :param data: Dataframe containing at least one column 
-    called label_col
-    :param label_col: The column used to specify class
-    :param min_samples: The minimum number of samples a
-    class needs to have to be kept.
-    """
-    return_cols = list(data.columns)    
-    keep = data.groupby(label_col).transform(
-        lambda x: len(x) > min_samples
-    ).values
-    return data.iloc[keep][return_cols]
-
-
 class InMemoryDataLoader(DataLoader):
+
     def __init__(self, config):
-        super(InMemoryDataLoader).__init__(config)
+        super(InMemoryDataLoader, self).__init__(config)
         
         if 'preprocessing_function' in self.config.data_loader.toDict():
             self.preprocess_func = create("tensorflow.keras.applications.{}".format(
@@ -52,9 +58,73 @@ class InMemoryDataLoader(DataLoader):
         else:
             self.preprocess_func = lambda x: x / 255.
 
+        if 'augmentations' in self.config.data_loader.toDict():
+            self.augmentations = self.config.data_loader.augmentations.toDict()
+        else:
+            self.augmentations = {}
+            
+        self.train_dataframe = self.build_files_dataframe('train')
+        self.train_dataframe = self.prune_files_list(self.train_dataframe)
+        
+        self.dev_dataframe = self.build_files_dataframe('dev')
+        self.test_dataframe = self.build_files_dataframe('test')
+
+        # Drop the classes that are not in the
+        # training set from test and dev. 
+        self.classes = np.unique(self.train_dataframe['label'])
+        self.dev_dataframe = self.drop_other_classes(self.dev_dataframe, self.classes)
+        self.test_dataframe = self.drop_other_classes(self.test_dataframe, self.classes)
+
+        # Load and preprocess the dataset. 
         self.load()
         self.preprocess()
 
-
+        # Setup generators and flows for training
+        self.train_gen = ImageDataGenerator(**self.augmentations)
+        self.train_flow = self.train_gen.flow(self.X_train, self.train_dataframe['label'].values,
+                                              batch_size=self.config.data_loader.batch_size)
+        
+        
     def load(self):
-        self.config.data_loder.base_dir
+        """ Load all of the images, this is time/memory consuming. """
+        self.X_train = np.zeros((len(self.train_dataframe), 224, 224, 3))
+        self.X_dev = np.zeros((len(self.dev_dataframe), 224, 224, 3))
+        self.X_test = np.zeros((len(self.test_dataframe), 224, 224, 3))
+
+        for i in range(len(self.train_dataframe)):
+            path = os.path.join(self.config.data_loader.base_dir + '/train',
+                                self.train_dataframe['file'].values[i])
+            self.X_train[i, :, :, :] = load_img(path, target_size=(224,224))
+
+        for i in range(len(self.dev_dataframe)):
+            path = os.path.join(self.config.data_loader.base_dir + '/dev',
+                                self.dev_dataframe['file'].values[i])
+            self.X_dev[i, :, :, :] = load_img(path, target_size=(224,224))
+
+        for i in range(len(self.test_dataframe)):
+            path = os.path.join(self.config.data_loader.base_dir + '/test',
+                                self.test_dataframe['file'].values[i])
+            self.X_test[i, :, :, :] = load_img(path, target_size=(224,224))
+            
+
+    def preprocess(self):
+        self.X_train = self.preprocess_func(self.X_train)
+        self.X_dev = self.preprocess_func(self.X_dev)
+        self.X_test = self.preprocess_func(self.X_test)
+        
+        
+    @property
+    def n_classes(self):
+        return len(self.classes)
+
+    def get_train_data(self):
+        return (self.X_train, self.train_dataframe['labels'].values)
+
+    def get_dev_data(self):
+        return (self.X_dev, self.dev_dataframe['labels'].values)
+
+    def get_test_data(self):
+        return (self.X_test, self.test_dataframe['labels'].values)
+
+    def get_train_flow(self):
+        return self.train_flow

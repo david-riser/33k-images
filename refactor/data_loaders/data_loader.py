@@ -4,6 +4,7 @@ import pandas as pd
 
 from base.base_data_loader import BaseDataLoader
 from utils.factory import create
+from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.preprocessing.image import load_img
 
@@ -62,7 +63,10 @@ class InMemoryDataLoader(DataLoader):
             self.augmentations = self.config.data_loader.augmentations.toDict()
         else:
             self.augmentations = {}
-            
+
+        # Encoder for the labels..
+        self.label_encoder = LabelEncoder()
+
         self.train_dataframe = self.build_files_dataframe('train')
         self.train_dataframe = self.prune_files_list(self.train_dataframe)
         
@@ -81,7 +85,7 @@ class InMemoryDataLoader(DataLoader):
 
         # Setup generators and flows for training
         self.train_gen = ImageDataGenerator(**self.augmentations)
-        self.train_flow = self.train_gen.flow(self.X_train, self.train_dataframe['label'].values,
+        self.train_flow = self.train_gen.flow(self.X_train, self.Y_train,
                                               batch_size=self.config.data_loader.batch_size)
         
         
@@ -90,7 +94,10 @@ class InMemoryDataLoader(DataLoader):
         self.X_train = np.zeros((len(self.train_dataframe), 224, 224, 3))
         self.X_dev = np.zeros((len(self.dev_dataframe), 224, 224, 3))
         self.X_test = np.zeros((len(self.test_dataframe), 224, 224, 3))
-
+        self.Y_train = self.label_encoder.fit_transform(self.train_dataframe['label'])
+        self.Y_dev = self.label_encoder.transform(self.dev_dataframe['label'])
+        self.Y_test = self.label_encoder.transform(self.test_dataframe['label'])
+        
         for i in range(len(self.train_dataframe)):
             path = os.path.join(self.config.data_loader.base_dir + '/train',
                                 self.train_dataframe['file'].values[i])
@@ -118,13 +125,13 @@ class InMemoryDataLoader(DataLoader):
         return len(self.classes)
 
     def get_train_data(self):
-        return (self.X_train, self.train_dataframe['labels'].values)
+        return (self.X_train, self.Y_train)
 
     def get_dev_data(self):
-        return (self.X_dev, self.dev_dataframe['labels'].values)
+        return (self.X_dev, self.Y_dev)
 
     def get_test_data(self):
-        return (self.X_test, self.test_dataframe['labels'].values)
+        return (self.X_test, self.Y_test)
 
     def get_train_flow(self):
         return self.train_flow

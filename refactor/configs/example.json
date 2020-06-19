@@ -17,7 +17,7 @@
     },
     "trainer":{
 	"name": "supervised_trainer.SupervisedTrainer",
-	"num_epochs": 5,
+	"num_epochs": 2,
 	"verbose_training": true
     },
     "callbacks":{

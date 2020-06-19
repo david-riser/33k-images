@@ -28,10 +28,12 @@ class PretrainedLinearModel(BaseModel):
             include_top=False
         )
 
-        #x = Dense(2048, activation='relu')(
-        #    self.backbone.output
-        #)
-        outputs = Dense(self.config.n_classes, activation='softmax')(self.backbone.output)
+        if 'dropout' in self.config.model.toDict():
+            x = Dropout(self.config.model.dropout)(self.backbone.output)
+            outputs = Dense(self.config.n_classes, activation='softmax')(x)
+        else:
+            outputs = Dense(self.config.n_classes, activation='softmax')(self.backbone.output)
+
         self.model = Model(inputs=self.backbone.input, outputs=outputs)
         self.model.compile(
               loss='sparse_categorical_crossentropy',

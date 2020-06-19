@@ -5,7 +5,8 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 
 class SupervisedTrainer(BaseTrain):
-
+    """ A standard supervised training class that 
+    uses cross-entropy loss. """
     def __init__(self, model, data, config):
         super(SupervisedTrainer, self).__init__(model, data, config)
         self.callbacks = []
@@ -28,8 +29,6 @@ class SupervisedTrainer(BaseTrain):
         )
 
     def train(self):
-        logger = logging.getLogger('train')
-        logger.debug('Calling model.fit')
         history = self.model.model.fit(
             x=self.data.get_train_flow(),
             validation_data=self.data.get_dev_data(),

@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 import os
 import pandas as pd
@@ -5,6 +6,7 @@ import pandas as pd
 from base.base_data_loader import BaseDataLoader
 from utils.factory import create
 from sklearn.preprocessing import LabelEncoder
+from sklearn.utils import resample
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.preprocessing.image import load_img
 
@@ -52,6 +54,8 @@ class InMemoryDataLoader(DataLoader):
 
     def __init__(self, config):
         super(InMemoryDataLoader, self).__init__(config)
+
+        self.logger = logging.getLogger('train')
         
         if 'preprocessing_function' in self.config.data_loader.toDict():
             self.preprocess_func = create("tensorflow.keras.applications.{}".format(
@@ -68,18 +72,31 @@ class InMemoryDataLoader(DataLoader):
         self.label_encoder = LabelEncoder()
 
         self.train_dataframe = self.build_files_dataframe('train')
-        self.train_dataframe = self.prune_files_list(self.train_dataframe)
-        
+        self.train_dataframe = self.prune_files_list(self.train_dataframe)        
         self.dev_dataframe = self.build_files_dataframe('dev')
         self.test_dataframe = self.build_files_dataframe('test')
 
+        # Shuffle the ordering
+        self.train_dataframe = self.train_dataframe.sample(frac=1).reset_index(drop=True)
+        self.dev_dataframe = self.dev_dataframe.sample(frac=1).reset_index(drop=True)
+        self.test_dataframe = self.test_dataframe.sample(frac=1).reset_index(drop=True)
+        
         # Drop the classes that are not in the
         # training set from test and dev. 
         self.classes = np.unique(self.train_dataframe['label'])
+        self.logger.debug('Training classes are {}'.format(self.classes))
         self.dev_dataframe = self.drop_other_classes(self.dev_dataframe, self.classes)
         self.test_dataframe = self.drop_other_classes(self.test_dataframe, self.classes)
 
-        # Load and preprocess the dataset. 
+        # If the user asked us to do some upsampling, we should
+        # do that before loading the images. 
+        if 'images_per_class' in self.config.data_loader.toDict():
+            self.train_dataframe = self._resample(self.train_dataframe)
+            self.logger.info('Resampled to size {}'.format(
+                self.config.data_loader.images_per_class
+            ))
+            
+            # Load and preprocess the dataset. 
         self.load()
         self.preprocess()
 
@@ -115,9 +132,29 @@ class InMemoryDataLoader(DataLoader):
             
 
     def preprocess(self):
+        self.logger.info('Preprocessing train, dev, and test.')
         self.X_train = self.preprocess_func(self.X_train)
         self.X_dev = self.preprocess_func(self.X_dev)
         self.X_test = self.preprocess_func(self.X_test)
+        
+
+    def _resample(self, df):
+        """ This method resamples all of the classes to a fixed 
+        number of images.  It will upsample and downsample. """
+
+        dataframes = []
+        for c in self.classes:
+            dataframes.append(
+                resample(
+                    df,
+                    replace=True,
+                    n_samples=self.config.data_loader.images_per_class
+                )
+            )
+
+        # Replace the training dataframe by the resampled stuffs
+        # here.
+        return pd.concat(dataframes)
         
         
     @property

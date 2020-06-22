@@ -1,3 +1,4 @@
+import logging
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -11,17 +12,24 @@ class GridPlottingEvaluator(BaseEvaluator):
     """
     def __init__(self, model, data, config):
         super(GridPlottingEvaluator, self).__init__(model, data, config)
+        self.logger = logging.getLogger('train')
         
     def evaluate(self):
 
-        if self.config.samples > len(self.data.y_test):
-            self.config.samples = len(self.data.y_test)
+        if self.config.samples > len(self.data.Y_test):
+            self.config.samples = len(self.data.Y_test)
 
+        # Get the testing images for use below. 
+        X_test, Y_test = self.data.get_test_data()
+        
         plots_per_page = self.config.ncols * self.config.nrows
         total_pages = self.config.samples // plots_per_page
-        colors = { i:np.random.randint(0, 255, 3) for i in np.unique(self.data.y_test) }
-        print(colors)
+        colors = { i:np.random.randint(0, 255, 3) for i in np.unique(Y_test) }
+        self.logger.debug(colors)
         
+        self.logger.info('GridPlottingEvaluator output is {}'.format(
+            self.config.output_name
+        ))
         with PdfPages(self.config.output_name) as pdf:
             fig, axs = plt.subplots(
                 figsize=(8, 11),
@@ -33,18 +41,20 @@ class GridPlottingEvaluator(BaseEvaluator):
             fig.subplots_adjust(wspace=0, hspace=0)
 
             indices = np.random.choice(
-                np.arange(len(self.data.X_test)),
+                np.arange(len(X_test)),
                 self.config.samples,
                 replace=False
             )
-            preds = self.model.model.predict(self.data.X_test)
+            preds = self.model.model.predict(X_test)
             preds = np.argmax(preds, axis=1)
             
             # We want the data to be as it should look
             # this will reload the data without applying
             # the preprocessing.
+            self.logger.debug('Forcefully re-loading data to remove preprocessing.')
             self.data.load()
-        
+            X_test, Y_test = self.data.get_test_data()
+            
             plot_order = np.argsort(preds)[np.sort(indices)]
             for i, index in enumerate(plot_order):
                 pad = 1 + i % plots_per_page
@@ -55,7 +65,7 @@ class GridPlottingEvaluator(BaseEvaluator):
                 if new_page and i > 0:
                     pdf.savefig(fig)
                     plt.close()
-                    print("Printing new page {}/{}".format(
+                    self.logger.info("Printing new page {}/{}".format(
                         i // plots_per_page, total_pages
                     ))
                     
@@ -66,10 +76,11 @@ class GridPlottingEvaluator(BaseEvaluator):
                 # ticks if they exist to unblock the
                 # figures and make them nicely sit
                 # next to each other.
-                img = self.data.X_test[index]
+                img = X_test[index]
                 x = self.color_pad(
                     img,
-                    colors[self.data.y_test[index][0]]
+                    colors[Y_test[index]],
+                    pixels = img.shape[0] // 20 + 1
                 )
                 axs[row,col].imshow(x)
                 axs[row,col].set_xticklabels([])

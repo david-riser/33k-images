@@ -38,17 +38,15 @@ def main():
         logging.info('Running trainer')
         trainer.train()
         
-        print('Loading evaluators')
+        logging.info('Loading evaluators')
         evaluators = []
         for evaluator in config.evaluators:
             evaluators.append(factory.create(
                 "evaluators." + evaluator.name
             )(model, data_loader, evaluator))
 
-        print('Start training the model.')
-        trainer.train()
 
-        print('Evaluating...')
+        logging.info('Evaluating...')
         for evaluator in evaluators:
             evaluator.evaluate()
         

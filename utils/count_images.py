@@ -6,7 +6,7 @@ import os
 data = {}
 folders = 0
 count = 0 
-for folder, _, files in os.walk('../../work_images'):
+for folder, _, files in os.walk('/home/ubuntu/data/train'):
     if 'tesseract' not in folder and 'lists' not in folder and 'scripts' not in folder:
         folders += 1
         count += len(files)

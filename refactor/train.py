@@ -28,17 +28,16 @@ def main():
         config.n_classes = data_loader.n_classes
         logger.debug('Running with {} classes.'.format(config.n_classes))
 
-        logger.info('Creating the model.')
+        logger.info('Creating model.')
         model = factory.create("models."+config.model.name)(config)
 
 
-        logging.info('Creating the trainer')
+        logging.info('Creating trainer')
         trainer = factory.create("trainers."+config.trainer.name)(model, data_loader, config)
 
         logging.info('Running trainer')
         trainer.train()
         
-        """
         print('Loading evaluators')
         evaluators = []
         for evaluator in config.evaluators:
@@ -52,7 +51,6 @@ def main():
         print('Evaluating...')
         for evaluator in evaluators:
             evaluator.evaluate()
-        """
         
     except Exception as e:
         print(e)

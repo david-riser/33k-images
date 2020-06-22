@@ -30,8 +30,8 @@
     },
     "evaluators":[
 	{
-	    "name": "cifar_evaluator.CifarEvaluator",
-	    "output_name": "/home/ubuntu/test_images.pdf",
+	    "name": "plot_evaluators.GridPlottingEvaluator",
+	    "output_name": "/home/ubuntu/grid_plot_eval_images.pdf",
 	    "nrows": 6,
 	    "ncols": 5,
 	    "samples": 320,

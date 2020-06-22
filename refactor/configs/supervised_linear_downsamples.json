@@ -6,8 +6,7 @@
 	"name": "data_loader.InMemoryDataLoader",
 	"base_dir": "/home/ubuntu/data",
 	"batch_size": 32,
-	"min_samples": 320,
-	"images_per_class": 320
+	"min_samples": 320
     },
     "model":{
 	"name": "pretrained_model.PretrainedLinearModel",
@@ -18,7 +17,7 @@
     },
     "trainer":{
 	"name": "supervised_trainer.SupervisedTrainer",
-	"num_epochs": 1,
+	"num_epochs": 20,
 	"verbose_training": true
     },
     "callbacks":{
@@ -35,7 +34,7 @@
 	    "output_name": "/home/ubuntu/grid_plot_eval_images.pdf",
 	    "nrows": 6,
 	    "ncols": 5,
-	    "samples": 100,
+	    "samples": 300,
 	    "dpi": 100
 	}
     ]

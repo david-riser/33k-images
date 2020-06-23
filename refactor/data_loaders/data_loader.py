@@ -9,6 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import resample
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.preprocessing.image import load_img
+from tensorflow.keras.utils import to_categorical
 
 class DataLoader(BaseDataLoader):
 
@@ -37,7 +38,6 @@ class DataLoader(BaseDataLoader):
         keep = data.groupby('label').transform(
             lambda x: len(x) > self.config.data_loader.min_samples
         ).values
-
         return data.iloc[keep][return_cols]
 
 
@@ -67,7 +67,8 @@ class InMemoryDataLoader(DataLoader):
             self.augmentations = self.config.data_loader.augmentations.toDict()
         else:
             self.augmentations = {}
-
+        self.logger.debug("Setup augmentations: {}".format(self.augmentations))
+            
         # Encoder for the labels..
         self.label_encoder = LabelEncoder()
 
@@ -96,7 +97,7 @@ class InMemoryDataLoader(DataLoader):
                 self.config.data_loader.images_per_class
             ))
             
-            # Load and preprocess the dataset. 
+        # Load and preprocess the dataset. 
         self.load()
         self.preprocess()
 
@@ -105,15 +106,23 @@ class InMemoryDataLoader(DataLoader):
         self.train_flow = self.train_gen.flow(self.X_train, self.Y_train,
                                               batch_size=self.config.data_loader.batch_size)
         
+        dev_augs = {}
+        self.dev_gen = ImageDataGenerator(**dev_augs)
+        self.dev_flow = self.dev_gen.flow(self.X_dev, self.Y_dev,
+                                          batch_size=self.config.data_loader.batch_size)
+
+        self.test_gen = ImageDataGenerator(**dev_augs)
+        self.test_flow = self.test_gen.flow(self.X_test, self.Y_test,
+                                          batch_size=self.config.data_loader.batch_size)
         
     def load(self):
         """ Load all of the images, this is time/memory consuming. """
         self.X_train = np.zeros((len(self.train_dataframe), 224, 224, 3))
         self.X_dev = np.zeros((len(self.dev_dataframe), 224, 224, 3))
         self.X_test = np.zeros((len(self.test_dataframe), 224, 224, 3))
-        self.Y_train = self.label_encoder.fit_transform(self.train_dataframe['label'])
-        self.Y_dev = self.label_encoder.transform(self.dev_dataframe['label'])
-        self.Y_test = self.label_encoder.transform(self.test_dataframe['label'])
+        self.Y_train = to_categorical(self.label_encoder.fit_transform(self.train_dataframe['label']))
+        self.Y_dev = to_categorical(self.label_encoder.transform(self.dev_dataframe['label']))
+        self.Y_test = to_categorical(self.label_encoder.transform(self.test_dataframe['label']))
         
         for i in range(len(self.train_dataframe)):
             path = os.path.join(self.config.data_loader.base_dir + '/train',
@@ -144,16 +153,15 @@ class InMemoryDataLoader(DataLoader):
 
         dataframes = []
         for c in self.classes:
+            indices = np.where(df['label'] == c)[0]
             dataframes.append(
                 resample(
-                    df,
+                    df.iloc[indices],
                     replace=True,
                     n_samples=self.config.data_loader.images_per_class
                 )
             )
 
-        # Replace the training dataframe by the resampled stuffs
-        # here.
         return pd.concat(dataframes)
         
         
@@ -172,3 +180,9 @@ class InMemoryDataLoader(DataLoader):
 
     def get_train_flow(self):
         return self.train_flow
+ 
+    def get_dev_flow(self):
+        return self.dev_flow
+
+    def get_test_flow(self):
+        return self.test_flow

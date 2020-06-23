@@ -6,19 +6,31 @@
 	"name": "data_loader.InMemoryDataLoader",
 	"base_dir": "/home/ubuntu/data",
 	"batch_size": 32,
-	"min_samples": 320
+	"min_samples": 320,
+	"augmentations":{
+	    "horizontal_flip":false,
+	    "vertical_flip":false,
+	    "zoom_range":0.0
+	}
     },
     "model":{
-	"name": "pretrained_model.PretrainedLinearModel",
-	"learning_rate": 0.001,
-	"optimizer": "adam",
+	"name": "pretrained_model.PretrainedModel",
 	"backbone": "ResNet50",
-	"pooling": "avg"
+	"pooling": "avg",
+	"optimizer": {
+	    "name":"adam",
+	    "params":{
+		"learning_rate":0.0001,
+		"beta_1": 0.9,
+		"beta_2": 0.99
+	    }
+	}
     },
     "trainer":{
 	"name": "supervised_trainer.SupervisedTrainer",
-	"num_epochs": 20,
-	"verbose_training": true
+	"num_epochs": 1,
+	"verbose_training": true,
+	"steps_per_epoch": 50
     },
     "callbacks":{
 	"checkpoint_monitor": "val_loss",

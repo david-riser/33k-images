@@ -31,10 +31,11 @@ class SupervisedTrainer(BaseTrain):
     def train(self):
         history = self.model.model.fit(
             x=self.data.get_train_flow(),
-            validation_data=self.data.get_dev_data(),
+            validation_data=self.data.get_dev_flow(),
             epochs=self.config.trainer.num_epochs,
             verbose=self.config.trainer.verbose_training,
             callbacks=self.callbacks,
+            steps_per_epoch=self.config.trainer.steps_per_epoch
         )
         self.loss.extend(history.history['loss'])
         self.acc.extend(history.history['accuracy'])

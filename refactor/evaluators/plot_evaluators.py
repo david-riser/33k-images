@@ -51,11 +51,20 @@ class GridPlottingEvaluator(BaseEvaluator):
             # We want the data to be as it should look
             # this will reload the data without applying
             # the preprocessing.
-            self.logger.debug('Forcefully re-loading data to remove preprocessing.')
+            self.logger.debug('Re-loading data to remove preprocessing.')
             self.data.load()
             X_test, Y_test = self.data.get_test_data()
-            
+
+            # If the input is categorical 
+            if len(Y_test.shape) > 1:
+                if Y_test.shape[1] > 1:
+                    self.logger.info('Projecting Y_test from one hot vector to scalar.')
+                    self.logger.debug('Shape before: {}'.format(Y_test.shape))
+                    Y_test = np.argmax(Y_test, axis=1)
+                    self.logger.debug('Shape after: {}'.format(Y_test.shape))
+                    
             plot_order = np.argsort(preds)[np.sort(indices)]
+            self.logger.debug("Plot order {}".format(plot_order))
             for i, index in enumerate(plot_order):
                 pad = 1 + i % plots_per_page
                 new_page = (pad == 1)

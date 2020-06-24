@@ -10,10 +10,6 @@ class SupervisedTrainer(BaseTrain):
     def __init__(self, model, data, config):
         super(SupervisedTrainer, self).__init__(model, data, config)
         self.callbacks = []
-        self.loss = []
-        self.acc = []
-        self.val_loss = []
-        self.val_acc = []
         self.init_callbacks()
 
     def init_callbacks(self):
@@ -29,7 +25,9 @@ class SupervisedTrainer(BaseTrain):
         )
 
     def train(self):
-        history = self.model.model.fit(
+        logger = logging.getLogger('train')
+        logger.debug('Start of call to model.fit')
+        self.history = self.model.model.fit(
             x=self.data.get_train_flow(),
             validation_data=self.data.get_dev_flow(),
             epochs=self.config.trainer.num_epochs,
@@ -37,7 +35,5 @@ class SupervisedTrainer(BaseTrain):
             callbacks=self.callbacks,
             steps_per_epoch=self.config.trainer.steps_per_epoch
         )
-        self.loss.extend(history.history['loss'])
-        self.acc.extend(history.history['accuracy'])
-        self.val_loss.extend(history.history['val_loss'])
-        self.val_acc.extend(history.history['val_accuracy'])
+        logger.debug('End of call to model.fit')
+        logger.debug('End of call to SupervisedTrainer.train')

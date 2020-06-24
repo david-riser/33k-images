@@ -8,9 +8,9 @@
 	"batch_size": 32,
 	"min_samples": 320,
 	"augmentations":{
-	    "horizontal_flip":false,
+	    "horizontal_flip":true,
 	    "vertical_flip":false,
-	    "zoom_range":0.0
+	    "zoom_range":0.1
 	}
     },
     "model":{
@@ -28,7 +28,7 @@
     },
     "trainer":{
 	"name": "supervised_trainer.SupervisedTrainer",
-	"num_epochs": 1,
+	"num_epochs": 5,
 	"verbose_training": true,
 	"steps_per_epoch": 50
     },

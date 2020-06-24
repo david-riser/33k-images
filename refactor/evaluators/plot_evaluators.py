@@ -20,12 +20,9 @@ class GridPlottingEvaluator(BaseEvaluator):
             self.config.samples = len(self.data.Y_test)
 
         # Get the testing images for use below. 
-        X_test, Y_test = self.data.get_test_data()
-        
+        X_test, Y_test = self.data.get_test_data()        
         plots_per_page = self.config.ncols * self.config.nrows
         total_pages = self.config.samples // plots_per_page
-        colors = { i:np.random.randint(0, 255, 3) for i in np.unique(Y_test) }
-        self.logger.debug(colors)
         
         self.logger.info('GridPlottingEvaluator output is {}'.format(
             self.config.output_name
@@ -55,7 +52,7 @@ class GridPlottingEvaluator(BaseEvaluator):
             self.data.load()
             X_test, Y_test = self.data.get_test_data()
 
-            # If the input is categorical 
+        # If the input is categorical 
             if len(Y_test.shape) > 1:
                 if Y_test.shape[1] > 1:
                     self.logger.info('Projecting Y_test from one hot vector to scalar.')
@@ -63,9 +60,13 @@ class GridPlottingEvaluator(BaseEvaluator):
                     Y_test = np.argmax(Y_test, axis=1)
                     self.logger.debug('Shape after: {}'.format(Y_test.shape))
                     
+            colors = { i:np.random.randint(0, 255, 3) for i in np.unique(Y_test) }
+            self.logger.debug(colors)
+
             plot_order = np.argsort(preds)[np.sort(indices)]
             self.logger.debug("Plot order {}".format(plot_order))
             for i, index in enumerate(plot_order):
+
                 pad = 1 + i % plots_per_page
                 new_page = (pad == 1)
                 
@@ -80,7 +81,7 @@ class GridPlottingEvaluator(BaseEvaluator):
                     
                 row = (pad - 1) // self.config.ncols
                 col = (pad - 1) % self.config.ncols
-    
+                
                 # Plot an image there and remove axis
                 # ticks if they exist to unblock the
                 # figures and make them nicely sit

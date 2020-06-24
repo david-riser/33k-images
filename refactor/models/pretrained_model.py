@@ -60,13 +60,17 @@ class PretrainedModel(BaseModel):
             last_frozen_layer = -2
         else:
             last_frozen_layer = -1
+
+        if use_dropout:
+            last_frozen_layer -= 1 
             
         for layer in self.model.layers[:last_frozen_layer]:
             layer.trainable = False
 
         for layer in self.model.layers[last_frozen_layer:]:
             layer.trainable = True
-
+            self.logger.info("Layer {} is unfrozen.".format(layer.name))
+            
         self.model.compile(
               loss='categorical_crossentropy',
               optimizer=self._build_optimizer(),

@@ -7,16 +7,22 @@
 	"base_dir": "/home/ubuntu/data",
 	"batch_size": 32,
 	"min_samples": 320,
+	"preprocessing_func":"resnet50.preprocess_input",
 	"augmentations":{
 	    "horizontal_flip":true,
-	    "vertical_flip":false,
-	    "zoom_range":0.1
+	    "zoom_range":0.2,
+	    "rotation_range":20,
+	    "height_shift_range":0.1,
+	    "width_shift_range":0.1
 	}
     },
     "model":{
 	"name": "pretrained_model.PretrainedModel",
 	"backbone": "ResNet50",
 	"pooling": "avg",
+	"dense_neurons": 32,
+	"dense_activation": "relu",
+	"dropout":0.35,
 	"optimizer": {
 	    "name":"adam",
 	    "params":{
@@ -28,7 +34,7 @@
     },
     "trainer":{
 	"name": "supervised_trainer.SupervisedTrainer",
-	"num_epochs": 5,
+	"num_epochs": 6,
 	"verbose_training": true,
 	"steps_per_epoch": 50
     },

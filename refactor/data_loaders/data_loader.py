@@ -85,9 +85,12 @@ class InMemoryDataLoader(DataLoader):
         # Drop the classes that are not in the
         # training set from test and dev. 
         self.classes = np.unique(self.train_dataframe['label'])
-        self.logger.debug('Training classes are {}'.format(self.classes))
+
         self.dev_dataframe = self.drop_other_classes(self.dev_dataframe, self.classes)
         self.test_dataframe = self.drop_other_classes(self.test_dataframe, self.classes)
+        self.logger.debug('Training classes are {}'.format(self.classes))
+        self.logger.debug('Dev classes are {}'.format(np.unique(self.dev_dataframe['label'])))
+        self.logger.debug('Test classes are {}'.format(np.unique(self.test_dataframe['label'])))
 
         # If the user asked us to do some upsampling, we should
         # do that before loading the images. 

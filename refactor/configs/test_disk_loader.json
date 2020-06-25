@@ -3,7 +3,7 @@
 	"name": "example_config"
     },
     "data_loader": {
-	"name": "data_loader.InMemoryDataLoader",
+	"name": "data_loader.DiskDataLoader",
 	"base_dir": "/home/ubuntu/data",
 	"batch_size": 32,
 	"min_samples": 320,
@@ -31,7 +31,7 @@
     },
     "trainer":{
 	"name": "supervised_trainer.SupervisedTrainer",
-	"num_epochs": 6,
+	"num_epochs": 3,
 	"verbose_training": true,
 	"steps_per_epoch": 50
     },

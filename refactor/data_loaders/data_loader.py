@@ -15,29 +15,18 @@ class DataLoader(BaseDataLoader):
 
     def __init__(self, config):
         super(DataLoader, self).__init__(config)
-
-        self.label_encoder = LabelEncoder()
         self.logger = logging.getLogger('train')
+        config_dict = self.config.data_loader.toDict()
         
-        if 'preprocessing_function' in self.config.data_loader.toDict():
-            self.preprocess_func = create("tensorflow.keras.applications.{}".format(
-                self.config.data_loader.preprocessing_function))
-        else:
-            self.preprocess_func = lambda x: x / 255.
-
-        if 'augmentations' in self.config.data_loader.toDict():
-            self.augmentations = self.config.data_loader.augmentations.toDict()
-        else:
-            self.augmentations = {}
-
-        self.logger.debug("Setup augmentations: {}".format(self.augmentations))
+        self._setup_preprocessing()
+        self._setup_augmentations()
 
         # Load the file names from disk and drop the
         # ones which do not have enough samples.
-        self.train_dataframe = self.build_files_dataframe('train')
-        self.train_dataframe = self.prune_files_list(self.train_dataframe)        
-        self.dev_dataframe = self.build_files_dataframe('dev')
-        self.test_dataframe = self.build_files_dataframe('test')
+        self.train_dataframe = self._build_files_dataframe('train')
+        self.train_dataframe = self._prune_files_list(self.train_dataframe)        
+        self.dev_dataframe = self._build_files_dataframe('dev')
+        self.test_dataframe = self._build_files_dataframe('test')
 
         # Shuffle the ordering
         self.train_dataframe = self.train_dataframe.sample(frac=1).reset_index(drop=True)
@@ -48,8 +37,8 @@ class DataLoader(BaseDataLoader):
         # training set from test and dev. 
         self.classes = np.unique(self.train_dataframe['label'])
 
-        self.dev_dataframe = self.drop_other_classes(self.dev_dataframe, self.classes)
-        self.test_dataframe = self.drop_other_classes(self.test_dataframe, self.classes)
+        self.dev_dataframe = self._drop_other_classes(self.dev_dataframe, self.classes)
+        self.test_dataframe = self._drop_other_classes(self.test_dataframe, self.classes)
         self.logger.debug('Training classes are {}'.format(self.classes))
         self.logger.debug('Dev classes are {}'.format(np.unique(self.dev_dataframe['label'])))
         self.logger.debug('Test classes are {}'.format(np.unique(self.test_dataframe['label'])))
@@ -63,13 +52,37 @@ class DataLoader(BaseDataLoader):
             ))
 
 
-    def build_files_dataframe(self, distr):
+    def _setup_preprocessing(self):
+        """ Setup the preprocessing function specified in the
+        configuration or use a 0-1 normalization if none is 
+        present. """
+        if 'preprocessing_func' in self.config.data_loader.toDict():
+            self.preprocess_func = create("tensorflow.keras.applications.{}".format(
+                self.config.data_loader.preprocessing_func))
+            self.logger.debug("Loaded {} for preprocessing".format(
+                self.config.data_loader.preprocessing_func))
+        else:
+            self.preprocess_func = lambda x: x / 255.
+            self.logger.debug("Using standard 0-1 normalization as preprocessing.")
+
+    def _setup_augmentations(self):
+        """ Read augmentations from configuration or 
+        load an empty dictionary. """
+        if 'augmentations' in self.config.data_loader.toDict():
+            self.augmentations = self.config.data_loader.augmentations.toDict()
+        else:
+            self.augmentations = {}
+        self.logger.debug("Setup augmentations: {}".format(self.augmentations))
+
+            
+    def _build_files_dataframe(self, distr):
         """ Search a directory tree to build a list of files 
         and their labels. """
         files, labels = [], []
-        
-        for folder, _, the_files in os.walk(os.path.join(self.config.data_loader.base_dir, distr)):
-            if folder != self.config.data_loader.base_dir:
+
+        source_dir = os.path.join(self.config.data_loader.base_dir, distr)
+        for folder, _, the_files in os.walk(source_dir):
+            if folder != source_dir:
                 label = folder.split('/')[-1]
                 for f in the_files:
                     labels.append(label)
@@ -79,7 +92,7 @@ class DataLoader(BaseDataLoader):
         return data
 
 
-    def prune_files_list(self, data):
+    def _prune_files_list(self, data):
         """ Remove classes which contain less than min_samples. """
         keep = data.groupby('label').transform(
             lambda x: len(x) > self.config.data_loader.min_samples
@@ -87,7 +100,7 @@ class DataLoader(BaseDataLoader):
         return data.iloc[keep]
 
 
-    def drop_other_classes(self, data, classes):
+    def _drop_other_classes(self, data, classes):
         """ Drop any other class from the dataframe 
         that does not exist in the classes list. """
         keep = data['label'].apply(
@@ -162,6 +175,8 @@ class InMemoryDataLoader(DataLoader):
         self.X_train = np.zeros((len(self.train_dataframe), 224, 224, 3))
         self.X_dev = np.zeros((len(self.dev_dataframe), 224, 224, 3))
         self.X_test = np.zeros((len(self.test_dataframe), 224, 224, 3))
+
+        self.label_encoder = LabelEncoder()
         self.Y_train = to_categorical(self.label_encoder.fit_transform(self.train_dataframe['label']))
         self.Y_dev = to_categorical(self.label_encoder.transform(self.dev_dataframe['label']))
         self.Y_test = to_categorical(self.label_encoder.transform(self.test_dataframe['label']))
@@ -223,6 +238,8 @@ class DiskDataLoader(DataLoader):
         """ The dev and test dataset are always loaded into memory. """
         self.X_dev = np.zeros((len(self.dev_dataframe), 224, 224, 3))
         self.X_test = np.zeros((len(self.test_dataframe), 224, 224, 3))
+
+        self.label_encoder = LabelEncoder()
         self.Y_train = to_categorical(self.label_encoder.fit_transform(self.train_dataframe['label']))
         self.Y_dev = to_categorical(self.label_encoder.transform(self.dev_dataframe['label']))
         self.Y_test = to_categorical(self.label_encoder.transform(self.test_dataframe['label']))

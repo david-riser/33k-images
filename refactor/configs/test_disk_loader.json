@@ -31,7 +31,7 @@
     },
     "trainer":{
 	"name": "supervised_trainer.SupervisedTrainer",
-	"num_epochs": 3,
+	"num_epochs": 5,
 	"verbose_training": true,
 	"steps_per_epoch": 50
     },

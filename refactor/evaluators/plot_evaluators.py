@@ -112,4 +112,3 @@ class GridPlottingEvaluator(BaseEvaluator):
         new_image[:,:,:] = color
         new_image[pixels : h + pixels, pixels : w + pixels] = image                
         return new_image
-        

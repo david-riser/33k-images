@@ -12,37 +12,35 @@ from tensorflow.keras.preprocessing.image import load_img
 from tensorflow.keras.utils import to_categorical
 
 class DataLoader(BaseDataLoader):
+    """ 
 
+    DataLoader is an abstract class, not to be
+    instantiated directly.  The methods defined
+    below are common to the other loaders.
+
+    The primary task for loading this dataset is
+    to crawl the folders and create a dataframe
+    that specifies paths and labels.  
+
+    """
     def __init__(self, config):
         super(DataLoader, self).__init__(config)
         self.logger = logging.getLogger('train')
-        config_dict = self.config.data_loader.toDict()
         
         self._setup_preprocessing()
         self._setup_augmentations()
 
-        # Load the file names from disk and drop the
-        # ones which do not have enough samples.
-        self.train_dataframe = self._build_files_dataframe('train')
-        self.train_dataframe = self._prune_files_list(self.train_dataframe)        
-        self.dev_dataframe = self._build_files_dataframe('dev')
-        self.test_dataframe = self._build_files_dataframe('test')
+        # Crawl the disk and create dataframes with the files
+        # and labels.  Then drop any classes which do not have
+        # at least min_samples training samples.
+        self._create_dataframes()
 
-        # Shuffle the ordering
-        self.train_dataframe = self.train_dataframe.sample(frac=1).reset_index(drop=True)
-        self.dev_dataframe = self.dev_dataframe.sample(frac=1).reset_index(drop=True)
-        self.test_dataframe = self.test_dataframe.sample(frac=1).reset_index(drop=True)
-        
-        # Drop the classes that are not in the
-        # training set from test and dev. 
+        # Ensure that the dev and test data have the same classes
+        # as the training data.  This means dropping the extras
+        # with a low number of samples.
         self.classes = np.unique(self.train_dataframe['label'])
-
-        self.dev_dataframe = self._drop_other_classes(self.dev_dataframe, self.classes)
-        self.test_dataframe = self._drop_other_classes(self.test_dataframe, self.classes)
-        self.logger.debug('Training classes are {}'.format(self.classes))
-        self.logger.debug('Dev classes are {}'.format(np.unique(self.dev_dataframe['label'])))
-        self.logger.debug('Test classes are {}'.format(np.unique(self.test_dataframe['label'])))
-
+        self._drop_dev_test_classes()
+        
         # If the user asked us to do some upsampling, we should
         # do that before loading the images. 
         if 'images_per_class' in self.config.data_loader.toDict():
@@ -74,7 +72,20 @@ class DataLoader(BaseDataLoader):
             self.augmentations = {}
         self.logger.debug("Setup augmentations: {}".format(self.augmentations))
 
-            
+
+    def _create_dataframes(self):
+        # Load the file names from disk and drop the
+        # ones which do not have enough samples.
+        self.train_dataframe = self._build_files_dataframe('train')
+        self.train_dataframe = self._prune_files_list(self.train_dataframe)        
+        self.dev_dataframe = self._build_files_dataframe('dev')
+        self.test_dataframe = self._build_files_dataframe('test')
+
+        # Shuffle the ordering
+        self.train_dataframe = self.train_dataframe.sample(frac=1).reset_index(drop=True)
+        self.dev_dataframe = self.dev_dataframe.sample(frac=1).reset_index(drop=True)
+        self.test_dataframe = self.test_dataframe.sample(frac=1).reset_index(drop=True)
+        
     def _build_files_dataframe(self, distr):
         """ Search a directory tree to build a list of files 
         and their labels. """
@@ -100,6 +111,14 @@ class DataLoader(BaseDataLoader):
         return data.iloc[keep]
 
 
+    def _drop_dev_test_classes(self):
+        self.dev_dataframe = self._drop_other_classes(self.dev_dataframe, self.classes)
+        self.test_dataframe = self._drop_other_classes(self.test_dataframe, self.classes)
+        self.logger.debug('Training classes are {}'.format(self.classes))
+        self.logger.debug('Dev classes are {}'.format(np.unique(self.dev_dataframe['label'])))
+        self.logger.debug('Test classes are {}'.format(np.unique(self.test_dataframe['label'])))
+
+        
     def _drop_other_classes(self, data, classes):
         """ Drop any other class from the dataframe 
         that does not exist in the classes list. """

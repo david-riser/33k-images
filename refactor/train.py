@@ -4,7 +4,7 @@ from utils.args import get_args
 from utils import factory
 import logging
 import sys
-
+ 
 
 def main():
 
@@ -23,8 +23,7 @@ def main():
         data_loader = factory.create("data_loaders."+config.data_loader.name)(config)
 
         # For this project the number of classes is only known
-        # at runtime so we add that to the configuration on the
-        # fly. 
+        # at runtime so we add that to the configuration.
         config.n_classes = data_loader.n_classes
         logger.debug('Running with {} classes.'.format(config.n_classes))
 

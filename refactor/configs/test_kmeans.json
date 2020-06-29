@@ -1,0 +1,36 @@
+{
+    "exp": {
+	"name": "example_config"
+    },
+    "data_loader": {
+	"name": "data_loader.DiskDataLoader",
+	"base_dir": "/home/ubuntu/data",
+	"batch_size": 256,
+	"min_samples": 320,
+	"preprocessing_func":"resnet50.preprocess_input"
+    },
+    "model":{
+	"name": "clustering_model.PretrainedKMeansModel",
+	"backbone": "ResNet50",
+	"pooling": "avg",
+	"n_clusters":12,
+	"pca_components":128
+    },
+    "trainer":{
+	"name": "clustering_trainer.PretrainedKMeansTrainer"
+    },
+    "evaluators":[
+	{
+	    "name": "plot_evaluators.GridPlottingEvaluator",
+	    "output_name": "/home/ubuntu/grid_plot_eval_images.pdf",
+	    "nrows": 6,
+	    "ncols": 5,
+	    "samples": 1000,
+	    "dpi": 100
+	},
+	{
+	    "name": "cluster_evaluators.LinearAssignmentMetricEvaluator",
+	    "metrics": ["accuracy", "balanced_accuracy", "f1_score"]
+	}
+    ]
+}

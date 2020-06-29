@@ -1,5 +1,7 @@
 import importlib
-from traceback import print_tb
+import sys
+import traceback
+
 
 def create(cls):
     '''expects a string that can be imported as with a module.class name'''
@@ -11,7 +13,8 @@ def create(cls):
 
     except Exception as err:
         print("Creating directories error: {0}".format(err))
-        print_tb()
+        _, _, tb = sys.exc_info()
+        traceback.print_tb(tb)
         exit(-1)
 
     return cls_instance

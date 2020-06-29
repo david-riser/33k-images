@@ -31,23 +31,15 @@ class DataLoader(BaseDataLoader):
         self._setup_augmentations()
 
         # Crawl the disk and create dataframes with the files
-        # and labels.  Then drop any classes which do not have
-        # at least min_samples training samples.
+        # and labels.  We then drop classes from all datasets
+        # that have less than min_samples in the training set.
         self._create_dataframes()
-
-        # Ensure that the dev and test data have the same classes
-        # as the training data.  This means dropping the extras
-        # with a low number of samples.
-        self.classes = np.unique(self.train_dataframe['label'])
-        self._drop_dev_test_classes()
+        self._drop_classes()
         
-        # If the user asked us to do some upsampling, we should
-        # do that before loading the images. 
+        # If there is upsampling of minority classes
+        # let's handle that last (only for the training set).
         if 'images_per_class' in self.config.data_loader.toDict():
-            self.train_dataframe = self._resample(self.train_dataframe)
-            self.logger.info('Resampled to size {}'.format(
-                self.config.data_loader.images_per_class
-            ))
+            self._resample()
 
 
     def _setup_preprocessing(self):
@@ -77,7 +69,6 @@ class DataLoader(BaseDataLoader):
         # Load the file names from disk and drop the
         # ones which do not have enough samples.
         self.train_dataframe = self._build_files_dataframe('train')
-        self.train_dataframe = self._prune_files_list(self.train_dataframe)        
         self.dev_dataframe = self._build_files_dataframe('dev')
         self.test_dataframe = self._build_files_dataframe('test')
 
@@ -111,7 +102,9 @@ class DataLoader(BaseDataLoader):
         return data.iloc[keep]
 
 
-    def _drop_dev_test_classes(self):
+    def _drop_classes(self):
+        self.train_dataframe = self._prune_files_list(self.train_dataframe)        
+        self.classes = np.unique(self.train_dataframe['label'])
         self.dev_dataframe = self._drop_other_classes(self.dev_dataframe, self.classes)
         self.test_dataframe = self._drop_other_classes(self.test_dataframe, self.classes)
         self.logger.debug('Training classes are {}'.format(self.classes))
@@ -143,13 +136,20 @@ class DataLoader(BaseDataLoader):
                 )
             )
 
-        return pd.concat(dataframes)
+        self.train_dataframe = pd.concat(dataframes)
+        self.logger.info('Resampled to size {}'.format(
+            self.config.data_loader.images_per_class
+        ))
 
     
     @property
     def n_classes(self):
         return len(self.classes)
 
+    @property
+    def n_training_samples(self):
+        return len(self.train_dataframe)
+    
     def get_train_data(self):
         return (self.X_train, self.Y_train)
 

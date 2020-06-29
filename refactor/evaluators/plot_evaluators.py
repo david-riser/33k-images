@@ -43,7 +43,9 @@ class GridPlottingEvaluator(BaseEvaluator):
                 replace=False
             )
             preds = self.model.model.predict(X_test)
-            preds = np.argmax(preds, axis=1)
+
+            if len(preds.shape) > 1:
+                preds = np.argmax(preds, axis=1)
             
             # We want the data to be as it should look
             # this will reload the data without applying

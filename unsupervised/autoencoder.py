@@ -88,15 +88,15 @@ def build_model(input_shape):
               strides=1, padding='same', activation='relu',
               use_pool=True, use_batchnorm=False)
     # 112 ---> 56
-    x = dconv(x, filters=64, kernel_size=(3,3),
+    x = dconv(x, filters=32, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_pool=True, use_batchnorm=False)
     # 56 ---> 28
-    x = dconv(x, filters=128, kernel_size=(3,3),
+    x = dconv(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_pool=True, use_batchnorm=False)
     # 28 ---> 14
-    x = dconv(x, filters=128, kernel_size=(3,3),
+    x = dconv(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_pool=True, use_batchnorm=False)
 
@@ -108,17 +108,17 @@ def build_model(input_shape):
     latent_space = Flatten()(x)
 
     # 14 ---> 28
-    x = uconv(x, filters=128, kernel_size=(3,3),
+    x = uconv(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
     # 28 ---> 56
-    x = uconv(x, filters=128, kernel_size=(3,3),
+    x = uconv(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
     # 56 ---> 112
-    x = uconv(x, filters=64, kernel_size=(3,3),
+    x = uconv(x, filters=32, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
@@ -128,13 +128,16 @@ def build_model(input_shape):
               use_batchnorm=False)
 
     x = Conv2D(filters=3, kernel_size=(3,3), strides=1,
-               padding='same', activation='tanh')(x)
+               padding='same', activation='sigmoid')(x)
     
     model = Model(inputs, x)
     encoder = Model(inputs, latent_space)
     return model, encoder
     
-    
+
+def normalize(x):
+    return x / 255.
+
 def main(args):
  
     print('[INFO] Starting clustering...')
@@ -154,7 +157,7 @@ def main(args):
         beta_1=args.beta1,
         beta_2=args.beta2
     )
-    model.compile(optimizer=optimizer, loss='mse')
+    model.compile(optimizer=optimizer, loss='binary_crossentropy')
     
     # Load the images into memory.  Right now
     # I am not supporting loading from disk.
@@ -166,7 +169,7 @@ def main(args):
         zoom_range=args.zoom,
         width_shift_range=args.width_shift,
         height_shift_range=args.height_shift,
-        preprocessing_function=preprocess_input,
+        preprocessing_function=normalize,
         rotation_range=args.rotation,        
     )
     
@@ -182,7 +185,7 @@ def main(args):
     )
 
     # Setup a generator for dev
-    no_augs_gen = ImageDataGenerator(preprocessing_function=preprocess_input)
+    no_augs_gen = ImageDataGenerator(preprocessing_function=normalize)
     dev_flow = no_augs_gen.flow_from_dataframe(
         dataframe=dev,
         directory=os.path.join(args.base_dir, 'dev'),

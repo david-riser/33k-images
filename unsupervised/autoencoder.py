@@ -16,6 +16,7 @@ PROJECT_DIR = os.path.abspath(os.path.join(os.getcwd(), '../'))
 print(PROJECT_DIR)
 sys.path.append(PROJECT_DIR)
 
+from project_core.metrics import hungarian_accuracy, hungarian_balanced_accuracy
 from project_core.models import model_factory, LinearModel
 from project_core.utils import load_image, build_files_dataframe, prune_file_list
 from sklearn.cluster import MiniBatchKMeans
@@ -83,51 +84,51 @@ def build_model(input_shape):
     inputs = Input(input_shape)
 
     # 224 ---> 112
-    x = dconv(inputs, filters=16, kernel_size=(3,3),
+    x = dconv(inputs, filters=32, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_pool=True, use_batchnorm=False)
     # 112 ---> 56
-    x = dconv(x, filters=16, kernel_size=(3,3),
+    x = dconv(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_pool=True, use_batchnorm=False)
     # 56 ---> 28
-    x = dconv(x, filters=16, kernel_size=(3,3),
+    x = dconv(x, filters=128, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_pool=True, use_batchnorm=False)
     # 28 ---> 14
-    x = dconv(x, filters=16, kernel_size=(3,3),
+    x = dconv(x, filters=128, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_pool=True, use_batchnorm=False)
 
     # Filter reduction
-    x = Conv2D(filters=4, kernel_size=(3,3),
+    x = Conv2D(filters=16, kernel_size=(3,3),
                strides=1, padding='same', activation='relu')(x)
     
     # Flatten the space
     latent_space = Flatten()(x)
 
     # 14 ---> 28
-    x = uconv(x, filters=16, kernel_size=(3,3),
+    x = uconv(x, filters=128, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
     # 28 ---> 56
-    x = uconv(x, filters=16, kernel_size=(3,3),
+    x = uconv(x, filters=128, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
     # 56 ---> 112
-    x = uconv(x, filters=16, kernel_size=(3,3),
+    x = uconv(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
     # 224 ---> 224
-    x = uconv(x, filters=16, kernel_size=(3,3),
+    x = uconv(x, filters=32, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
     x = Conv2D(filters=3, kernel_size=(3,3), strides=1,
-               padding='same', activation=None)(x)
+               padding='same', activation='tanh')(x)
     
     model = Model(inputs, x)
     encoder = Model(inputs, latent_space)
@@ -157,7 +158,7 @@ def main(args):
     
     # Load the images into memory.  Right now
     # I am not supporting loading from disk.
-    train, dev = load_dataframes(args.base_dir, args.min_samples)
+    train, dev, test = load_dataframes(args.base_dir, args.min_samples)
     
     # Use an image data generator to save memory.
     augs = dict(
@@ -181,9 +182,20 @@ def main(args):
     )
 
     # Setup a generator for dev
-    dev_flow = gen.flow_from_dataframe(
+    no_augs_gen = ImageDataGenerator(preprocessing_function=preprocess_input)
+    dev_flow = no_augs_gen.flow_from_dataframe(
         dataframe=dev,
         directory=os.path.join(args.base_dir, 'dev'),
+        batch_size=args.batch_size,
+        target_size=(224,224),
+        shuffle=False,
+        x_col='file',
+        class_mode=None
+    )
+
+    test_flow = no_augs_gen.flow_from_dataframe(
+        dataframe=test,
+        directory=os.path.join(args.base_dir, 'test'),
         batch_size=args.batch_size,
         target_size=(224,224),
         shuffle=False,
@@ -201,19 +213,16 @@ def main(args):
     for epoch in range(args.epochs):
 
         # Train
-        loss = []
         for batch in range(batches):
             x_batch = next(train_flow)
-            loss.append(model.train_on_batch(x_batch, x_batch))
+            loss = model.train_on_batch(x_batch, x_batch)
+            wandb.log({'loss':loss})
 
-        dev_loss = []
         for batch in range(dev_batches):
             x_batch = next(dev_flow)
-            dev_loss.append(model.evaluate(x_batch, x_batch))
-
-        wandb.log({'loss':np.mean(loss)})
-        wandb.log({'dev_loss':np.mean(dev_loss)})
-
+            dev_loss = model.evaluate(x_batch, x_batch)
+            wandb.log({'dev_loss':dev_loss})
+            
         
     print('[INFO] Running linear evaluation...')
     for layer in encoder.layers:
@@ -222,6 +231,7 @@ def main(args):
     label_encoder = LabelEncoder()
     train['encoded_label'] = label_encoder.fit_transform(train['label'])
     dev['encoded_label'] = label_encoder.transform(dev['label'])
+    test['encoded_label'] = label_encoder.transform(test['label'])
 
     train_flow = gen.flow_from_dataframe(
         dataframe=train,
@@ -233,16 +243,52 @@ def main(args):
         y_col='label',
         class_mode='categorical'
     )
- 
-    linear_eval(
-        encoder=encoder,
-        train_gen=train_flow,
-        dev_gen=dev_flow,
-        train_labels=train['encoded_label'],
-        dev_labels=dev['encoded_label'],
-        metric=balanced_accuracy_score,
-        log_training=True
+
+
+    kmeans = MiniBatchKMeans(n_clusters=train['label'].nunique())
+    batches = int(np.ceil(len(train) / args.batch_size))
+    for i in range(batches):
+        kmeans.partial_fit(encoder.predict(
+            next(train_flow)))
+        
+    dev_clusters = []
+    test_clusters = []
+    batches = int(np.ceil(len(dev) / args.batch_size))
+    for i in range(batches):
+        dev_clusters.extend(
+            kmeans.predict(encoder.predict(next(dev_flow)))
+        )
+        
+    batches = int(np.ceil(len(test) / args.batch_size))
+    for i in range(batches):
+        test_clusters.extend(
+            kmeans.predict(encoder.predict(next(test_flow)))
+        )
+
+    dev_clusters = np.array(dev_clusters)
+    test_clusters = np.array(test_clusters)
+
+    accuracy = hungarian_accuracy(dev['encoded_label'], dev_clusters)
+    balanced_accuracy = hungarian_balanced_accuracy(dev['encoded_label'], dev_clusters)
+    wandb.log(
+        {"dev_accuracy":accuracy, "dev_balanced_accuracy":balanced_accuracy}
     )
+
+    accuracy = hungarian_accuracy(test['encoded_label'], test_clusters)
+    balanced_accuracy = hungarian_balanced_accuracy(test['encoded_label'], test_clusters)
+    wandb.log(
+        {"test_accuracy":accuracy, "test_balanced_accuracy":balanced_accuracy}
+    )
+    
+    #linear_eval(
+    #    encoder=encoder,
+    #    train_gen=train_flow,
+    #    dev_gen=dev_flow,
+    #    train_labels=train['encoded_label'],
+    #    dev_labels=dev['encoded_label'],
+    #    metric=balanced_accuracy_score,
+    #    log_training=True
+    #)
         
     print('[INFO] Finished!')
 
@@ -259,7 +305,7 @@ def get_args():
     ap.add_argument('--height_shift', type=float, default=0.1)
     ap.add_argument('--width_shift', type=float, default=0.1)
     ap.add_argument('--rotation', type=int, default=0)
-    ap.add_argument('--zoom', type=int, default=0.0)
+    ap.add_argument('--zoom', type=float, default=0.0)
     ap.add_argument('--epochs', type=int, default=5)
     return ap.parse_args()
 
@@ -273,10 +319,16 @@ def load_dataframes(data_dir, min_samples):
     classes = np.unique(train['label'])
     dev['keep'] = dev['label'].apply(lambda x: x in classes)
     dev = dev[dev['keep'] == True]
+
+    test = build_files_dataframe(os.path.join(data_dir, 'test'))
+    test_cols = list(test.columns)
+    test['keep'] = test['label'].apply(lambda x: x in classes)
+    test = test[test['keep'] == True]
     
     train = train.sample(frac=1).reset_index(drop=True)
     dev = dev.sample(frac=1).reset_index(drop=True)
-    return train, dev
+    test = test.sample(frac=1).reset_index(drop=True)
+    return train, dev, test
 
 
 def setup_wandb(args):

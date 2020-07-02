@@ -33,12 +33,12 @@ from tensorflow.keras.layers  import (Input, Conv2D, Dense,
                                       Conv2DTranspose,
                                       Flatten, MaxPooling2D,
                                       BatchNormalization, Reshape,
-                                      UpSampling2D)
+                                      UpSampling2D, Add, Activation)
 from wandb.keras import WandbCallback
 
 def dconv(inputs, filters, kernel_size,
           strides, padding, activation,
-          use_batchnorm, use_pool):
+          use_batchnorm, use_pool, use_residual):
     x = Conv2D(
         filters=filters,
         kernel_size=kernel_size,
@@ -54,11 +54,20 @@ def dconv(inputs, filters, kernel_size,
         activation=activation
     )(x)
 
+    if use_residual:
+        shortcut = Conv2D(filters=filters, strides=strides,
+                          padding=padding, activation=None,
+                          kernel_size=(1,1)
+        )(x)
+        x = Add()([shortcut, x])
+        x = Activation(activation)(x)
+        
     if use_pool:
         x = MaxPooling2D()(x)
 
     if use_batchnorm:
         x = BatchNormalization()(x)
+
         
     return x
 
@@ -78,52 +87,90 @@ def uconv(inputs, filters, kernel_size,
         x = BatchNormalization()(x)
 
     return x
+
+
+def uconv_transpose(inputs, filters, kernel_size,
+                    activation, strides, padding,
+                    use_batchnorm):
     
-def build_model(input_shape):
+    x = Conv2DTranspose(filters=filters, kernel_size=(1,1), strides=(2,2))(inputs)
+    x = Conv2D(filters=filters, kernel_size=kernel_size,
+               strides=strides, activation=activation,
+               padding=padding)(x)
+    x = Conv2D(filters=filters, kernel_size=kernel_size,
+               strides=strides, activation=activation,
+               padding=padding)(x)
+
+    if use_batchnorm:
+        x = BatchNormalization()(x)
+
+    return x
+
+
+def build_model(input_shape, latent_dims):
 
     inputs = Input(input_shape)
 
+    if input_shape[0] % 16 > 0:
+        raise ValueError("Ensure that the input_shape of the image is square and divisible by 16.")
+    
     # 224 ---> 112
     x = dconv(inputs, filters=32, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_pool=True, use_batchnorm=False)
+              use_pool=True, use_batchnorm=False,
+              use_residual=False)
     # 112 ---> 56
     x = dconv(x, filters=32, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_pool=True, use_batchnorm=False)
+              use_pool=True, use_batchnorm=False,
+              use_residual=False)
     # 56 ---> 28
     x = dconv(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_pool=True, use_batchnorm=False)
+              use_pool=True, use_batchnorm=False,
+              use_residual=False)
     # 28 ---> 14
     x = dconv(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
-              use_pool=True, use_batchnorm=False)
+              use_pool=True, use_batchnorm=False,
+              use_residual=False)
 
-    # Filter reduction
-    x = Conv2D(filters=16, kernel_size=(3,3),
+    # Filter reduction to go to desired number of latent
+    # dimensions.
+    pixels = int((input_shape[0] / 16)**2)
+    if latent_dims < pixels:
+        raise ValueError("Pixels = {}, Latent dims = {}".format(
+            pixels, latent_dims
+        ))
+
+    flattened_size = int(pixels * 64)
+    if latent_dims % pixels > 0:
+        raise ValueError("Problem creating {} latent dims from flat size {}".format(
+            latent_dims, flattened_size))
+    latent_filters = int(latent_dims / pixels)
+    x = Conv2D(filters=latent_filters, kernel_size=(3,3),
                strides=1, padding='same', activation='relu')(x)
     
     # Flatten the space
     latent_space = Flatten()(x)
 
     # 14 ---> 28
-    x = uconv(x, filters=64, kernel_size=(3,3),
+    x = uconv_transpose(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
     # 28 ---> 56
-    x = uconv(x, filters=64, kernel_size=(3,3),
+    x = uconv_transpose(x, filters=64, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
     # 56 ---> 112
-    x = uconv(x, filters=32, kernel_size=(3,3),
+    x = uconv_transpose(x, filters=32, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
     # 224 ---> 224
-    x = uconv(x, filters=32, kernel_size=(3,3),
+    x = uconv_transpose(x, filters=32, kernel_size=(3,3),
               strides=1, padding='same', activation='relu',
               use_batchnorm=False)
 
@@ -138,6 +185,28 @@ def build_model(input_shape):
 def normalize(x):
     return x / 255.
 
+
+def plot_examples(x_true, x_pred, output_path):
+    """ Take these examples and plot them to an output file. """
+
+    n_images = x_true.shape[0]
+    plt.figure(figsize=(8,8))
+    rows = int(np.sqrt(2 * n_images)) + 1
+    for i in range(n_images):
+        plt.subplot(rows, rows, 2*i+1)
+        plt.imshow(x_true[i])
+        plt.xticks([])
+        plt.yticks([])
+
+        plt.subplot(rows, rows, 2*i+2)
+        plt.imshow(x_pred[i])
+        plt.xticks([])
+        plt.yticks([])
+        
+    plt.tight_layout()
+    plt.savefig(output_path, bbox_inches='tight')
+
+    
 def main(args):
  
     print('[INFO] Starting clustering...')
@@ -148,7 +217,7 @@ def main(args):
     # Setup the pre-trained backbone for our model.  This is
     # done first to get the preprocessing function for the net.
     #encoder, preprocess = model_factory(args.backbone, pooling=args.pooling)
-    model, encoder = build_model((224,224,3))
+    model, encoder = build_model((args.pixels,args.pixels,3), args.latent_dim)
     print(model.summary())
     print(encoder.summary())
 
@@ -157,7 +226,7 @@ def main(args):
         beta_1=args.beta1,
         beta_2=args.beta2
     )
-    model.compile(optimizer=optimizer, loss='binary_crossentropy')
+    model.compile(optimizer=optimizer, loss='mse')
     
     # Load the images into memory.  Right now
     # I am not supporting loading from disk.
@@ -178,7 +247,7 @@ def main(args):
         dataframe=train,
         directory=os.path.join(args.base_dir, 'train'),
         batch_size=args.batch_size,
-        target_size=(224,224),
+        target_size=(args.pixels,args.pixels),
         shuffle=True,
         x_col='file',
         class_mode=None
@@ -190,7 +259,7 @@ def main(args):
         dataframe=dev,
         directory=os.path.join(args.base_dir, 'dev'),
         batch_size=args.batch_size,
-        target_size=(224,224),
+        target_size=(args.pixels,args.pixels),
         shuffle=False,
         x_col='file',
         class_mode=None
@@ -200,7 +269,7 @@ def main(args):
         dataframe=test,
         directory=os.path.join(args.base_dir, 'test'),
         batch_size=args.batch_size,
-        target_size=(224,224),
+        target_size=(args.pixels,args.pixels),
         shuffle=False,
         x_col='file',
         class_mode=None
@@ -240,7 +309,7 @@ def main(args):
         dataframe=train,
         directory=os.path.join(args.base_dir, 'train'),
         batch_size=args.batch_size,
-        target_size=(224,224),
+        target_size=(args.pixels,args.pixels),
         shuffle=True,
         x_col='file',
         y_col='label',
@@ -282,6 +351,11 @@ def main(args):
     wandb.log(
         {"test_accuracy":accuracy, "test_balanced_accuracy":balanced_accuracy}
     )
+
+    x_batch = next(dev_flow)
+    plot_examples(x_batch, model.predict(x_batch), "/home/ubuntu/autoencoder_samples.pdf")
+
+    encoder.save("encoder.{}.hdf5".format(wandb.run.id))
     
     #linear_eval(
     #    encoder=encoder,
@@ -309,7 +383,9 @@ def get_args():
     ap.add_argument('--width_shift', type=float, default=0.1)
     ap.add_argument('--rotation', type=int, default=0)
     ap.add_argument('--zoom', type=float, default=0.0)
-    ap.add_argument('--epochs', type=int, default=5)
+    ap.add_argument('--epochs', type=int, default=1)
+    ap.add_argument('--pixels', type=int, default=256)
+    ap.add_argument('--latent_dim', type=int, default=2048)
     return ap.parse_args()
 
 def load_dataframes(data_dir, min_samples):

@@ -56,6 +56,13 @@ def main(args):
         beta_2=args.beta2
     )
     model.compile(optimizer=optimizer, loss='kld')
+
+    
+    encoder_weights, encoder_biases = encoder.layers[1].get_weights()
+    model_weights, model_biases = model.backbone.layers[1].get_weights()
+    print("[INFO] Checking weights and biases equality before running...")
+    print("[INFO] Weights ", np.sum(encoder_weights - model_weights))
+    print("[INFO] Biases ", np.sum(encoder_biases - model_biases))
     
     # Load the images into memory.  Right now
     # I am not supporting loading from disk.
@@ -123,12 +130,19 @@ def main(args):
         p = clustering_target_distribution(q)
 
         for _ in range(args.repeat_batch):
+
+            encoder_weights, encoder_biases = encoder.layers[1].get_weights()
+            model_weights, model_biases = model.backbone.layers[1].get_weights()
+            print("[INFO] Checking weights and biases equality...")
+            print("[INFO] Weights ", np.sum(encoder_weights - model_weights))
+            print("[INFO] Biases ", np.sum(encoder_biases - model_biases))
+
             sub_batches = int(np.ceil(args.batch_size / 32))
             for i in range(sub_batches):
                 loss = model.train_on_batch(x=batch[i*32:(i+1)*32], y=p[i*32:(i+1)*32])
                 wandb.log({'kld_loss':loss})
 
-    
+                
     # Fit the sucker
     batches = int(np.ceil(len(train) / args.batch_size))
     dev_batches = int(np.ceil(len(dev) / args.batch_size))

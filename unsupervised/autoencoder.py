@@ -21,7 +21,7 @@ from project_core.models import model_factory, LinearModel
 from project_core.utils import load_image, build_files_dataframe, prune_file_list
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.metrics import adjusted_rand_score, balanced_accuracy_score
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from tensorflow.keras import Model
 from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.optimizers import Adam
@@ -279,7 +279,6 @@ def main(args):
     for layer in model.layers:
         layer.trainable = True
 
-    # Fit the sucker
     batches = int(np.ceil(len(train) / args.batch_size))
     dev_batches = int(np.ceil(len(dev) / args.batch_size))
     for epoch in range(args.epochs):
@@ -289,14 +288,23 @@ def main(args):
             x_batch = next(train_flow)
             loss = model.train_on_batch(x_batch, x_batch)
             wandb.log({'loss':loss})
-
+            
         for batch in range(dev_batches):
             x_batch = next(dev_flow)
             dev_loss = model.evaluate(x_batch, x_batch)
             wandb.log({'dev_loss':dev_loss})
             
         
-    print('[INFO] Running linear evaluation...')
+    # This scaler is used to normalize before
+    # doing clustering.  The online run is done
+    # on the training data to collect statistics.
+    print('[INFO] Fitting the scaler.')
+    scaler = StandardScaler()
+    for batch in range(batches):
+        x_batch = next(train_flow)
+        scaler.partial_fit(encoder.predict(x_batch))
+    
+    print('[INFO] Running metric evaluation...')
     for layer in encoder.layers:
         encoder.trainable = False
         
@@ -320,21 +328,37 @@ def main(args):
     kmeans = MiniBatchKMeans(n_clusters=train['label'].nunique())
     batches = int(np.ceil(len(train) / args.batch_size))
     for i in range(batches):
-        kmeans.partial_fit(encoder.predict(
-            next(train_flow)))
+        kmeans.partial_fit(
+            scaler.transform(
+                encoder.predict(
+                    next(train_flow))
+            )
+        )
         
     dev_clusters = []
     test_clusters = []
     batches = int(np.ceil(len(dev) / args.batch_size))
     for i in range(batches):
         dev_clusters.extend(
-            kmeans.predict(encoder.predict(next(dev_flow)))
+            kmeans.predict(
+                scaler.transform(
+                    encoder.predict(
+                        next(dev_flow)
+                    )
+                )
+            )
         )
         
     batches = int(np.ceil(len(test) / args.batch_size))
     for i in range(batches):
         test_clusters.extend(
-            kmeans.predict(encoder.predict(next(test_flow)))
+            kmeans.predict(
+                scaler.transform(
+                    encoder.predict(
+                        next(test_flow)
+                    )
+                )
+            )
         )
 
     dev_clusters = np.array(dev_clusters)
@@ -356,16 +380,6 @@ def main(args):
     plot_examples(x_batch, model.predict(x_batch), "/home/ubuntu/autoencoder_samples.pdf")
 
     encoder.save("encoder.{}.hdf5".format(wandb.run.id))
-    
-    #linear_eval(
-    #    encoder=encoder,
-    #    train_gen=train_flow,
-    #    dev_gen=dev_flow,
-    #    train_labels=train['encoded_label'],
-    #    dev_labels=dev['encoded_label'],
-    #    metric=balanced_accuracy_score,
-    #    log_training=True
-    #)
         
     print('[INFO] Finished!')
 

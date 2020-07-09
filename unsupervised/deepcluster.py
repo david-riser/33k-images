@@ -34,7 +34,7 @@ def main(args):
 
     # Load the images into memory.  Right now
     # I am not supporting loading from disk.
-    train, dev = load_dataframes(args.base_dir, args.min_samples)
+    train, dev, test = load_dataframes(args.base_dir, args.min_samples)
     
     # Use an image data generator to save memory.
     augs = dict(preprocessing_function=preprocess)
@@ -151,7 +151,6 @@ def get_args():
     ap.add_argument('--base_dir', type=str, default='/home/ubuntu/data')
     ap.add_argument('--clusters', type=int, default=12)
     ap.add_argument('--min_samples', type=int, default=320)
-    
     ap.add_argument('--batch_size', type=int, default=32)
     ap.add_argument('--backbone', type=str, default='ResNet50')
     ap.add_argument('--pooling', type=str, default='avg')

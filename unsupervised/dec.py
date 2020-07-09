@@ -122,10 +122,11 @@ def main(args):
         q = model.predict(batch, verbose=0)
         p = clustering_target_distribution(q)
 
-        sub_batches = int(np.ceil(args.batch_size / 32))
-        for i in range(sub_batches):
-            loss = model.train_on_batch(x=batch[i*32:(i+1)*32], y=p[i*32:(i+1)*32])
-            wandb.log({'kld_loss':loss})
+        for _ in range(args.repeat_batch):
+            sub_batches = int(np.ceil(args.batch_size / 32))
+            for i in range(sub_batches):
+                loss = model.train_on_batch(x=batch[i*32:(i+1)*32], y=p[i*32:(i+1)*32])
+                wandb.log({'kld_loss':loss})
 
     
     # Fit the sucker
@@ -200,7 +201,9 @@ def get_args():
     ap.add_argument('--beta1', type=float, default=0.9)
     ap.add_argument('--beta2', type=float, default=0.99)
     ap.add_argument('--total_batches', type=int, default=40)
+    ap.add_argument('--repeat_batch', type=int, default=1)
     ap.add_argument('--pixels', type=int, default=256)
+
     return ap.parse_args()
 
 def load_dataframes(data_dir, min_samples):
